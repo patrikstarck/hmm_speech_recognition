@@ -191,12 +191,12 @@ void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length) {
 }
 
 void logp_xn_zn(arm_matrix_instance_f32 observ,speech *mu_sig,arm_matrix_instance_f32 *xn_zn,uint8_t n_states,uint8_t n_features) {
-		float32_t X_minus_mu[n_features];
+		float32_t X_minus_mu[NUMBER_OF_MFCC];
 		float32_t sum_val = 0;
 	    float32_t C =  (-0.5)*n_features*log(2*MATH_PI);
 		arm_matrix_instance_f32 X_minus_mu_mat = {n_features,1,X_minus_mu};
 		arm_matrix_instance_f32 X_minus_mu_mat_tran = {1,n_features,X_minus_mu};
-		float32_t multi[n_features];
+		float32_t multi[NUMBER_OF_MFCC];
 		arm_matrix_instance_f32 mat_multi = {1,n_features,multi};
 		for(int i = 0;i<n_states;i++) {
 			sum_val = 0;
@@ -232,11 +232,11 @@ void MatrixMax(arm_matrix_instance_f32 *C,uint8_t col,float32_t *max,uint16_t *i
 }
 
 void viterbi_log_NR(arm_matrix_instance_f32 *A,arm_matrix_instance_f32 *xn_zn,arm_matrix_instance_f32 *path,arm_matrix_instance_f32 *logV,uint8_t path_length,uint8_t n_states) {
-		float32_t Alog[n_states*n_states]; // init A_plus_logV
-		float32_t c[n_states*n_states]; // Init C
+		float32_t Alog[NUMBER_OF_STATES*NUMBER_OF_STATES]; // init A_plus_logV
+		float32_t c[NUMBER_OF_STATES*NUMBER_OF_STATES]; // Init C
 		float32_t max_C = 0;
 		uint16_t C_max_ind = 0;
-		uint16_t PATH[n_states];
+		uint16_t PATH[NUMBER_OF_STATES];
 		arm_matrix_instance_f32 A_plus_logV = {n_states,n_states,Alog};
 		arm_matrix_instance_f32 C_mat = {n_states,n_states,c};
 

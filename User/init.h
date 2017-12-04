@@ -114,8 +114,8 @@ extern float32_t speech_det_6;
 extern float32_t speech_det_7;
 extern float32_t speech_det_8;
 extern float32_t speech_det_9;
-extern float32_t speech_det_13;
-extern float32_t speech_det_18;
+extern float32_t speech_det_10;
+extern float32_t speech_det_11;
 
 
 extern float32_t speech_A[(NUMBER_OF_STATES*NUMBER_OF_STATES)];
