@@ -3,6 +3,29 @@
 
 #include "includes.h"
 
+// Define hmm struct
+
+//Define struct
+typedef struct speech {
+	arm_matrix_instance_f32* mu;
+	arm_matrix_instance_f32* sig;
+	arm_matrix_instance_f32* inv;
+	float32_t* det;
+
+}speech;
+
+/*Defines*/
+#define NUMBER_OF_WORDS 2
+#define MAX_SEQ_PER_WORD 20
+#define MAX_SEQUENCES_PER_SEQ 20
+#define MATH_PI 3.141592653589793
+#define NUMBER_OF_STATES 11
+#define NUMBER_OF_MFCC 13
+#define PATH_LENGTH 5
+#define TRANS_PATH_LENGTH 10
+#define FRAME_LENGTH 256
+#define VEC_LENGTH 10000
+
 /*MFCC*/
 void simple_mel_extractor_v2(arm_matrix_instance_f32 *frame_power, arm_matrix_instance_f32 *MFCC_mat);
 
@@ -18,26 +41,5 @@ void MatrixMax(arm_matrix_instance_f32 *C,uint8_t col,float32_t *max,uint16_t *i
 void viterbi_log_NR(arm_matrix_instance_f32 *A,arm_matrix_instance_f32 *xn_zn,arm_matrix_instance_f32 *path,arm_matrix_instance_f32 *logV,uint8_t path_length,uint8_t n_states);
 void path_filter(arm_matrix_instance_f32 *path,arm_matrix_instance_f32 *filtered_path,uint8_t path_length);
 void trans_path(arm_matrix_instance_f32 *filtered_path,arm_matrix_instance_f32 *trans_path,uint8_t filtered_path_length,uint8_t trans_path_length);
-
-/*Defines*/
-#define NUMBER_OF_WORDS 2
-#define MAX_SEQ_PER_WORD 20
-#define MAX_SEQUENCES_PER_SEQ 20
-#define MATH_PI 3.141592653589793
-#define NUMBER_OF_STATES 11
-#define NUMBER_OF_MFCC 13
-#define PATH_LENGTH 5
-#define TRANS_PATH_LENGTH 10
-#define FRAME_LENGTH 256
-#define VEC_LENGTH 10000
-
-//Define struct
-typedef struct speech {
-	arm_matrix_instance_f32* mu;
-	arm_matrix_instance_f32* sig;
-	arm_matrix_instance_f32* inv;
-	float32_t* det;
-
-}speech;
 
 #endif
