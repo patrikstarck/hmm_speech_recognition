@@ -93,6 +93,62 @@ void main(void)
  //Exract mfcc from fft frame
  simple_mel_extractor_v2(&frame_power_mat,&MFCC_mat);
  
+ // Assign vectors to matrices
+ speech_HMM[0].mu = &speech_mu_1_mat;
+ speech_HMM[0].sig = &speech_sigma_1_mat;
+ speech_HMM[0].det = &speech_det_1;
+ speech_HMM[0].inv =	&speech_sigma_inverse_1_mat;
+
+ speech_HMM[1].mu = &speech_mu_2_mat;
+ speech_HMM[1].sig = &speech_sigma_2_mat;
+ speech_HMM[1].det = &speech_det_2;
+ speech_HMM[1].inv =	&speech_sigma_inverse_2_mat;
+
+ speech_HMM[2].mu = &speech_mu_3_mat;
+ speech_HMM[2].sig = &speech_sigma_3_mat;
+ speech_HMM[2].det = &speech_det_3;
+ speech_HMM[2].inv =	&speech_sigma_inverse_3_mat;
+
+ speech_HMM[3].mu = &speech_mu_4_mat;
+ speech_HMM[3].sig = &speech_sigma_4_mat;
+ speech_HMM[3].det = &speech_det_4;
+ speech_HMM[3].inv =	&speech_sigma_inverse_4_mat;
+
+ speech_HMM[4].mu = &speech_mu_5_mat;
+ speech_HMM[4].sig = &speech_sigma_5_mat;
+ speech_HMM[4].det = &speech_det_5;
+ speech_HMM[4].inv =	&speech_sigma_inverse_5_mat;
+
+ speech_HMM[5].mu = &speech_mu_6_mat;
+ speech_HMM[5].sig = &speech_sigma_6_mat;
+ speech_HMM[5].det = &speech_det_6;
+ speech_HMM[5].inv =	&speech_sigma_inverse_6_mat;
+
+ speech_HMM[6].mu = &speech_mu_7_mat;
+ speech_HMM[6].sig = &speech_sigma_7_mat;
+ speech_HMM[6].det = &speech_det_7;
+ speech_HMM[6].inv =	&speech_sigma_inverse_7_mat;
+
+ speech_HMM[7].mu = &speech_mu_8_mat;
+ speech_HMM[7].sig = &speech_sigma_8_mat;
+ speech_HMM[7].det = &speech_det_8;
+ speech_HMM[7].inv =	&speech_sigma_inverse_8_mat;
+
+ speech_HMM[8].mu = &speech_mu_9_mat;
+ speech_HMM[8].sig = &speech_sigma_9_mat;
+ speech_HMM[8].det = &speech_det_9;
+ speech_HMM[8].inv =	&speech_sigma_inverse_9_mat;
+
+ speech_HMM[9].mu = &speech_mu_10_mat;
+ speech_HMM[9].sig = &speech_sigma_10_mat;
+ speech_HMM[9].det = &speech_det_10;
+ speech_HMM[9].inv =	&speech_sigma_inverse_10_mat;
+
+ speech_HMM[10].mu = &speech_mu_11_mat;
+ speech_HMM[10].sig = &speech_sigma_11_mat;
+ speech_HMM[10].det = &speech_det_11;
+ speech_HMM[10].inv =	&speech_sigma_inverse_11_mat; 
+
   
 while (1)
   {
