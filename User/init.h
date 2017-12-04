@@ -14,7 +14,10 @@ extern float32_t fft_frame[FRAME_LENGTH];
 
 extern float32_t p_xn_zn[NUMBER_OF_STATES];
 extern float32_t X[NUMBER_OF_MFCC];
+extern float32_t MFCC_vec[NUMBER_OF_MFCC];
 
+extern arm_matrix_instance_f32 fft_mat;
+extern arm_matrix_instance_f32 MFCC_output_mat;
 extern arm_matrix_instance_f32 p_xn_zn_mat;
 extern arm_matrix_instance_f32 obs_X;
 
