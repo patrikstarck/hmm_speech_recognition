@@ -20,5 +20,16 @@ void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length);
 #define NUMBER_OF_MFCC 13
 #define PATH_LENGTH 5
 #define TRANS_PATH_LENGTH 10
+#define FRAME_LENGTH 256
+#define VEC_LENGTH 10000
+
+//Define struct
+typedef struct speech {
+	arm_matrix_instance_f32* mu;
+	arm_matrix_instance_f32* sig;
+	arm_matrix_instance_f32* inv;
+	float32_t* det;
+
+}speech;
 
 #endif
