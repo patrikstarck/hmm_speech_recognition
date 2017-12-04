@@ -9,7 +9,7 @@ float32_t time_[7001]={0.000640869140625000,0.000518798828125000,0.0002136230468
 /******Variable declaration*******/
 /*********************************/
 
-
+arm_rfft_fast_instance_f32 S_RFFT_1;
 /**************/
 /*Lexicon Data*/
 /**************/
@@ -187,6 +187,171 @@ void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length) {
       
     }
   }
+
+}
+
+void logp_xn_zn(arm_matrix_instance_f32 observ,speech *mu_sig,arm_matrix_instance_f32 *xn_zn,uint8_t n_states,uint8_t n_features) {
+		float32_t X_minus_mu[n_features];
+		float32_t sum_val = 0;
+	    float32_t C =  (-0.5)*n_features*log(2*MATH_PI);
+		arm_matrix_instance_f32 X_minus_mu_mat = {n_features,1,X_minus_mu};
+		arm_matrix_instance_f32 X_minus_mu_mat_tran = {1,n_features,X_minus_mu};
+		float32_t multi[n_features];
+		arm_matrix_instance_f32 mat_multi = {1,n_features,multi};
+		for(int i = 0;i<n_states;i++) {
+			sum_val = 0;
+			arm_mat_sub_f32(&observ,(mu_sig+i)->mu,&X_minus_mu_mat); // X-mu = out (X,mu,out)
+			arm_mat_trans_f32(&X_minus_mu_mat,&X_minus_mu_mat_tran);
+			arm_mat_mult_f32(&X_minus_mu_mat_tran,(mu_sig+i)->inv,&mat_multi); // A*B = out (A,B,Out)
+			for(int k = 0;k<n_features;k++) {
+				mat_multi.pData[k] = mat_multi.pData[k]*X_minus_mu_mat.pData[k];
+			}
+
+			for(int n = 0;n<mat_multi.numCols;n++) {
+				sum_val = sum_val + mat_multi.pData[n];
+			}
+
+			(xn_zn->pData[i]) = C - *((mu_sig+i)->det) - 0.5*sum_val;
+		}
+
+}
+
+	/*Returns the maximum value*/
+void MatrixMax(arm_matrix_instance_f32 *C,uint8_t col,float32_t *max,uint16_t *ind) {
+		// This function takes the maximum value in a given colum col in the square matrix C
+		// If C is 3x3 matrix then col must be a value on the set [0;2]
+		float32_t maxvalue;
+		*max = C->pData[col];
+		for(int i = 1;i<C->numRows;i++) {
+			maxvalue = C->pData[i*(C->numCols)+col];
+			if(maxvalue>*max) {
+				*max = maxvalue;
+				*ind = i;
+			}
+		}
+}
+
+void viterbi_log_NR(arm_matrix_instance_f32 *A,arm_matrix_instance_f32 *xn_zn,arm_matrix_instance_f32 *path,arm_matrix_instance_f32 *logV,uint8_t path_length,uint8_t n_states) {
+		float32_t Alog[n_states*n_states]; // init A_plus_logV
+		float32_t c[n_states*n_states]; // Init C
+		float32_t max_C = 0;
+		uint16_t C_max_ind = 0;
+		uint16_t PATH[n_states];
+		arm_matrix_instance_f32 A_plus_logV = {n_states,n_states,Alog};
+		arm_matrix_instance_f32 C_mat = {n_states,n_states,c};
+
+		// Update path
+		// last element in path: *(path+path_length-1);
+		for(int i = 0;i<(path_length-1);i++) {
+			path->pData[i] = path->pData[i+1];// Move all elements on step to the right
+		}
+
+		for(int i = 0;i<(n_states);i++) {
+			for(int k = 0;k<n_states;k++) { // FIX IF: A->pData[k+i*n_states] = 0
+				if(A->pData[k+i*n_states]==0) {
+					A_plus_logV.pData[k+i*n_states] = 0;
+				}
+				else {
+					A_plus_logV.pData[k*n_states+i] = log(A->pData[k*n_states+i])+logV->pData[k];
+				}
+
+				//A_plus_logV(k,i) = log(A(k,i)) + previous(1,k); Matlab ..
+			}
+		}
+
+
+		for(int i = 0;i<(n_states);i++) {
+			for(int k = 0;k<n_states;k++) {
+				C_mat.pData[k*n_states+i] = A_plus_logV.pData[k+i*n_states]+xn_zn->pData[k];
+				//C(k,i) = A_plus_logV(i,k) + p_xn_zn(1,k); Matlab ..
+			}
+		}
+
+		for(uint8_t i = 0;i<n_states;i++) {
+			MatrixMax(&C_mat,i,&max_C,&C_max_ind);
+			logV->pData[i] = max_C;
+			PATH[i] = C_max_ind;
+		}
+		MatrixMax(logV,0,&max_C,&C_max_ind);
+		path->pData[path_length-1] = C_max_ind;
+		path->pData[path_length-2]  = PATH[(int)(path->pData[path_length-1])];
+		max_C = 0;
+
+		for(int i = 0;i<n_states;i++) {
+			max_C = max_C + logV->pData[i];
+		}
+		arm_mat_scale_f32(logV,1/max_C,logV);
+}
+
+void path_filter(arm_matrix_instance_f32 *path,arm_matrix_instance_f32 *filtered_path,uint8_t path_length) {
+	filtered_path->pData[0] = path->pData[0];
+	for(int i = 1;i<path_length;i++) {
+		if(path->pData[i] ==  path->pData[i-1]) {
+			filtered_path->pData[i] = path->pData[i];
+		}
+		else {
+			filtered_path->pData[i] = filtered_path->pData[i-1];
+		}
+	}
+}
+
+void trans_path(arm_matrix_instance_f32 *filtered_path,arm_matrix_instance_f32 *trans_path,uint8_t filtered_path_length,uint8_t trans_path_length) {
+	if(filtered_path->pData[filtered_path_length-1] == filtered_path->pData[filtered_path_length-2]) {
+		// Do nothing
+	}
+	else {
+		for(int i = 0;i<(trans_path_length-1);i++) {
+			trans_path->pData[i] = trans_path->pData[i+1];// Move all elements on step to the right
+		}
+		trans_path->pData[trans_path_length-1] = filtered_path->pData[filtered_path_length-1];
+	}
+}
+
+void framer(float32_t *in_vec,int length_in_vec,float32_t *frame,int frame_length,int frame_nr) {
+		int frame_index = 0;
+		int odd = 100;
+
+		odd =frame_nr-(frame_nr/2 +frame_nr/2);
+
+		if(frame_nr<2*(length_in_vec/frame_length)) {
+			if(odd == 1) {
+				frame_nr = (frame_nr/2)+1;
+				for(int i = (frame_nr-1)*frame_length;i<(frame_length*frame_nr);i++) {
+					*(frame+frame_index) = *(in_vec+i);
+					frame_index++;
+				}
+			}
+			if(odd == 0) {
+				frame_nr = (frame_nr/2);
+				for(int i = ((frame_nr-1)*frame_length+128);i<((frame_length*frame_nr)+128);i++) {
+					*(frame+frame_index) = *(in_vec+i);
+					frame_index++;
+				}
+			}
+
+		}
+		else {
+			// This is bad!
+		}
+}
+
+void windower(float32_t *window,float32_t *frame,int frame_length) {
+		for(int i = 0;i<frame_length;i++){
+			*(frame+i) = (*(frame+i))*(*(window+i));
+		}
+}
+
+
+void preprocessing(float32_t *frame,float32_t *fft_frame,float32_t *window,int frame_size) {
+
+	windower(window,frame,frame_size); // Apply blackman window
+
+	arm_rfft_fast_init_f32(&S_RFFT_1, frame_size);
+	arm_rfft_fast_f32(&S_RFFT_1, &frame[0],&fft_frame[0],0);
+	arm_cmplx_mag_squared_f32(&fft_frame[0], &fft_frame[0], frame_size/2);
+	for(int i = 0;i<(frame_size/2+1);i++) {
+		*(fft_frame+i) = *(fft_frame+i)/256;
+	}
 
 }
 
