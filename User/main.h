@@ -26,6 +26,7 @@
 #define DAC_DHR12L2_Address      0x40007418
 
 extern uint16_t adc_sample_buffer[SAMPLE_BUFFER_LENGTH];
+extern uint16_t adc_sample_buffer_overlap[SAMPLE_BUFFER_LENGTH];
 
 void PGPIO_Configuration(void);
 void PDAC_Init_func(void);

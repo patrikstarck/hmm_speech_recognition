@@ -237,21 +237,21 @@ void ADC1_2_IRQHandler(void)
 void doFft(uint16_t *source, uint16_t length) {
   
   
-
-  /*Fill the buffer with floats(conversion)*/
-  for(uint16_t i=0; i<length; i++){
-    fft_input_and_output[i] = (float32_t)*(source+i);
-  }
- // printf("ok\r\n");
-  
-
-    
-  /*Do the FFT*/
-  arm_rfft_fast_f32(&S_RFFT_1, &fft_input_and_output[0],&fft_input_and_output[0],0);
-  arm_cmplx_mag_f32(&fft_input_and_output[0], &fft_input_and_output[0], length/2);
-  
-
-  
+//
+//  /*Fill the buffer with floats(conversion)*/
+//  for(uint16_t i=0; i<length; i++){
+//    fft_input_and_output[i] = (float32_t)*(source+i);
+//  }
+// // printf("ok\r\n");
+//  
+//
+//    
+//  /*Do the FFT*/
+//  arm_rfft_fast_f32(&S_RFFT_1, &fft_input_and_output[0],&fft_input_and_output[0],0);
+//  arm_cmplx_mag_f32(&fft_input_and_output[0], &fft_input_and_output[0], length/2);
+//  
+//
+//  
   //asd
   /*Init the cdt*/
  // arm_rfft_fast_init_f32(&S_RFFT_2, length/2);
