@@ -27,6 +27,7 @@
 #include "main.h"
 #include "functions.h"
 #include "decoder.h"
+#include "init.h"
    
 #include "drv_glcd_cnfg.h"
 #include "drv_glcd.h"
