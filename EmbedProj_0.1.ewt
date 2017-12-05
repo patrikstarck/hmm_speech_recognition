@@ -2502,6 +2502,9 @@
             <name>$PROJ_DIR$\User\includes.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\User\init.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\main.c</name>
         </file>
         <file>

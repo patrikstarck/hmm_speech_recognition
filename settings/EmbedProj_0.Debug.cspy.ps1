@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\patri\Google Drive\Skola\Projekt i IS (5hp)\Projekt IB - Clean Speech\15hp\IAR Programmering\EmbedProj_0.1\settings\EmbedProj_0.Debug.general.xcl" --backend -f "C:\Users\patri\Google Drive\Skola\Projekt i IS (5hp)\Projekt IB - Clean Speech\15hp\IAR Programmering\EmbedProj_0.1\settings\EmbedProj_0.Debug.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "D:\Git\hmm_speech_recognition\settings\EmbedProj_0.Debug.general.xcl" --backend -f "D:\Git\hmm_speech_recognition\settings\EmbedProj_0.Debug.driver.xcl" 
 }
 else
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\patri\Google Drive\Skola\Projekt i IS (5hp)\Projekt IB - Clean Speech\15hp\IAR Programmering\EmbedProj_0.1\settings\EmbedProj_0.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\patri\Google Drive\Skola\Projekt i IS (5hp)\Projekt IB - Clean Speech\15hp\IAR Programmering\EmbedProj_0.1\settings\EmbedProj_0.Debug.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "D:\Git\hmm_speech_recognition\settings\EmbedProj_0.Debug.general.xcl" --debug_file=$debugfile --backend -f "D:\Git\hmm_speech_recognition\settings\EmbedProj_0.Debug.driver.xcl" 
 }

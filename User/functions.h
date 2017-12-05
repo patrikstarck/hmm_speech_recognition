@@ -25,7 +25,7 @@ typedef struct speech {
 #define PATH_LENGTH 5
 #define TRANS_PATH_LENGTH 10
 #define FRAME_LENGTH 256
-#define VEC_LENGTH 10000
+#define VEC_LENGTH 9500
 
 /*MFCC*/
 void simple_mel_extractor_v2(arm_matrix_instance_f32 *frame_power, arm_matrix_instance_f32 *MFCC_mat);

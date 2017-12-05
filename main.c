@@ -149,6 +149,7 @@ void main(void)
  speech_HMM[10].det = &speech_det_11;
  speech_HMM[10].inv =	&speech_sigma_inverse_11_mat; 
 
+ run_all();
   
 while (1)
   {
