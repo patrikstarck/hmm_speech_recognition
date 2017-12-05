@@ -226,7 +226,7 @@ void MatrixMax(arm_matrix_instance_f32 *C,uint8_t col,float32_t *max,uint16_t *i
 		*max = C->pData[col];
 		for(int i = 1;i<C->numRows;i++) {
 			maxvalue = C->pData[i*(C->numCols)+col];
-			if(maxvalue>*max) {
+			if(maxvalue>*max && *max > -1000000000) {
 				*max = maxvalue;
 				*ind = i;
 			}
@@ -234,13 +234,13 @@ void MatrixMax(arm_matrix_instance_f32 *C,uint8_t col,float32_t *max,uint16_t *i
 }
 
 void viterbi_log_NR(arm_matrix_instance_f32 *A,arm_matrix_instance_f32 *xn_zn,arm_matrix_instance_f32 *path,arm_matrix_instance_f32 *logV,uint8_t path_length,uint8_t n_states) {
-		float32_t Alog[NUMBER_OF_STATES*NUMBER_OF_STATES]; // init A_plus_logV
-		float32_t c[NUMBER_OF_STATES*NUMBER_OF_STATES]; // Init C
+		float32_t Alog[(A_SIZE)]; // init A_plus_logV
+		float32_t c[(A_SIZE)]; // Init C
 		float32_t max_C = 0;
 		uint16_t C_max_ind = 0;
 		uint16_t PATH[NUMBER_OF_STATES];
-		arm_matrix_instance_f32 A_plus_logV = {n_states,n_states,Alog};
-		arm_matrix_instance_f32 C_mat = {n_states,n_states,c};
+		arm_matrix_instance_f32 A_plus_logV = {NUMBER_OF_STATES,NUMBER_OF_STATES,Alog};
+		arm_matrix_instance_f32 C_mat = {NUMBER_OF_STATES,NUMBER_OF_STATES,c};
 
 		// Update path
 		// last element in path: *(path+path_length-1);
@@ -250,11 +250,11 @@ void viterbi_log_NR(arm_matrix_instance_f32 *A,arm_matrix_instance_f32 *xn_zn,ar
 
 		for(int i = 0;i<(n_states);i++) {
 			for(int k = 0;k<n_states;k++) { // FIX IF: A->pData[k+i*n_states] = 0
-				if(A->pData[k+i*n_states]==0) {
-					A_plus_logV.pData[k+i*n_states] = 0;
+				if(A->pData[k*n_states+i] == 0 || logV->pData[k] == 0) {
+					A_plus_logV.pData[k*n_states+i] = -1000000000;
 				}
 				else {
-					A_plus_logV.pData[k*n_states+i] = log(A->pData[k*n_states+i])+logV->pData[k];
+					A_plus_logV.pData[k*n_states+i] = (A->pData[k*n_states+i])+logV->pData[k];
 				}
 
 				//A_plus_logV(k,i) = log(A(k,i)) + previous(1,k); Matlab ..
@@ -264,25 +264,56 @@ void viterbi_log_NR(arm_matrix_instance_f32 *A,arm_matrix_instance_f32 *xn_zn,ar
 
 		for(int i = 0;i<(n_states);i++) {
 			for(int k = 0;k<n_states;k++) {
-				C_mat.pData[k*n_states+i] = A_plus_logV.pData[k+i*n_states]+xn_zn->pData[k];
+				if (A_plus_logV.pData[k+i*n_states] == 0) {
+					C_mat.pData[k*n_states+i] = -1000000000;
+				}
+				else {
+					C_mat.pData[k*n_states+i] = A_plus_logV.pData[k+i*n_states]+xn_zn->pData[k];
+				}
 				//C(k,i) = A_plus_logV(i,k) + p_xn_zn(1,k); Matlab ..
 			}
 		}
+
+		/*int ts = 0;
+
+				for(int k = 0;k<(n_states*n_states);k++){
+					ts = ts+1;
+					trace_printf("   %f", C_mat.pData[k]);
+					if (ts == n_states) {
+						ts = 0;
+						trace_printf(" \n");
+					}
+				}*/
 
 		for(uint8_t i = 0;i<n_states;i++) {
 			MatrixMax(&C_mat,i,&max_C,&C_max_ind);
 			logV->pData[i] = max_C;
 			PATH[i] = C_max_ind;
+			//trace_printf("index \n%i\n",C_max_ind);
+			//trace_printf("Max_val \n%f\n",max_C);
 		}
+
+
 		MatrixMax(logV,0,&max_C,&C_max_ind);
 		path->pData[path_length-1] = C_max_ind;
-		path->pData[path_length-2]  = PATH[(int)(path->pData[path_length-1])];
-		max_C = 0;
+		path->pData[path_length-1]  = PATH[(int)(path->pData[path_length-1])];
 
+		for(int i = 0;i<NUMBER_OF_STATES;i++) {
+			if (logV->pData[i] < -100000000) {
+				logV->pData[i] = 0;
+			}
+		}
+		/*for(int i = 0;i<NUMBER_OF_STATES;i++) {
+			trace_printf("Logv \n%f\n",logV->pData[i]);
+		}*/
+		max_C = 0;
 		for(int i = 0;i<n_states;i++) {
 			max_C = max_C + logV->pData[i];
 		}
+		//trace_printf("Max_val \n%f\n",max_C);
+
 		arm_mat_scale_f32(logV,1/max_C,logV);
+
 }
 
 void path_filter(arm_matrix_instance_f32 *path,arm_matrix_instance_f32 *filtered_path,uint8_t path_length) {
@@ -355,6 +386,20 @@ void preprocessing(float32_t *frame,float32_t *fft_frame,float32_t *window,int f
 		*(fft_frame+i) = *(fft_frame+i)/256;
 	}
 
+}
+
+void run_all() {
+
+	for (int i = 1;i<2*(VEC_LENGTH/FRAME_LENGTH);i++) { // Main loop over length of signal
+		framer(sound_vec,VEC_LENGTH,frame,FRAME_LENGTH,i); // Get new frame
+
+	preprocessing(frame,fft_frame,window,FRAME_LENGTH); // Window and transform
+	simple_mel_extractor_v2(&fft_mat,&MFCC_output_mat); // Extract MFCC
+	logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
+	viterbi_log_NR(&speech_A_mat,&p_xn_zn_mat,&speech_path_mat,&speech_logV_mat,PATH_LENGTH,NUMBER_OF_STATES); //Get path
+	path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
+	trans_path(&speech_filtered_path_mat,&speech_trans_path_mat,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
+	}
 }
 
 
