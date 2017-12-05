@@ -20,6 +20,7 @@ typedef struct speech {
 #define MAX_SEQUENCES_PER_SEQ 20
 #define MATH_PI 3.141592653589793
 #define NUMBER_OF_STATES 11
+#define A_SIZE 121
 #define NUMBER_OF_MFCC 13
 #define PATH_LENGTH 5
 #define TRANS_PATH_LENGTH 10
