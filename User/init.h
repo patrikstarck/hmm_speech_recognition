@@ -121,7 +121,7 @@ extern float32_t speech_det_10;
 extern float32_t speech_det_11;
 
 
-extern float32_t speech_A[(NUMBER_OF_STATES*NUMBER_OF_STATES)];
+extern float32_t speech_A[A_SIZE];
 extern arm_matrix_instance_f32 speech_A_mat;
 
 #endif /* INIT_H_ */
