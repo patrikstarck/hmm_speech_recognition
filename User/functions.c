@@ -57,6 +57,8 @@ float32_t H2[380]={0.500000000000000,1,0.666666666666667,0.333333333333333,0,0,0
 arm_matrix_instance_f32 H2_mat = {20, 19, H2};
 uint8_t H2_start[20]={9,11,14,17,20,23,26,30,34,38,42,47,52,57,63,70,76,84,91,100};
 
+  float32_t multi2[20];
+  arm_matrix_instance_f32 mat_multi_2 = {20,1,multi2}; 
 
 /*****END MFCC data*******/
 
@@ -77,25 +79,24 @@ uint8_t H2_start[20]={9,11,14,17,20,23,26,30,34,38,42,47,52,57,63,70,76,84,91,10
 void simple_mel_extractor_v2(arm_matrix_instance_f32 *frame_power, arm_matrix_instance_f32 *MFCC_mat) {
 
   //Multiply with H(fancy way)
-  float32_t multi[20];
-  arm_matrix_instance_f32 mat_multi = {20,1,multi}; 
+
   for(int i=0;i<20;i++) {
     float32_t tmp_sum = 0;
-    for(int j=0;j<H2_ROW_LENGTH;j++) {
+    for(int j=0;j<H2_ROW_LENGTH-1;j++) {
       tmp_sum = tmp_sum + ((*(frame_power->pData+H2_start[i]+j))*H2[i*H2_ROW_LENGTH+j]);
     }
-    *(mat_multi.pData+i)=tmp_sum;
+    *(mat_multi_2.pData+i)=tmp_sum;
   }
 
 //  arm_mat_mult_f32(&H_mat,frame_power,&mat_multi);  //Heavier way to multiply with H 
     
   //Log
   for(int i=0;i<20;i++) {
-    *(mat_multi.pData+i)=log(*(mat_multi.pData+i));
+    *(mat_multi_2.pData+i)=log(*(mat_multi_2.pData+i));
   }
 
   //DCT
-  arm_mat_mult_f32(&DCT_mat,&mat_multi,MFCC_mat);
+  arm_mat_mult_f32(&DCT_mat,&mat_multi_2,MFCC_mat);
 
   //Ceplifter
   for(int i=0;i<13;i++) {
@@ -195,26 +196,44 @@ void logp_xn_zn(arm_matrix_instance_f32 observ,speech *mu_sig,arm_matrix_instanc
 		float32_t X_minus_mu[NUMBER_OF_MFCC];
 		float32_t sum_val = 0;
 	    float32_t C =  (-0.5)*n_features*log(2*MATH_PI);
-		arm_matrix_instance_f32 X_minus_mu_mat = {n_features,1,X_minus_mu};
-		arm_matrix_instance_f32 X_minus_mu_mat_tran = {1,n_features,X_minus_mu};
+		arm_matrix_instance_f32 X_minus_mu_mat = {NUMBER_OF_MFCC,1,X_minus_mu};
+		arm_matrix_instance_f32 X_minus_mu_mat_tran = {1,NUMBER_OF_MFCC,X_minus_mu};
 		float32_t multi[NUMBER_OF_MFCC];
-		arm_matrix_instance_f32 mat_multi = {1,n_features,multi};
+		arm_matrix_instance_f32 mat_multi = {1,NUMBER_OF_MFCC,multi};
 		for(int i = 0;i<n_states;i++) {
+                  printf("n_state: ");
+                  printf("1");
 			arm_mat_sub_f32(&observ,(mu_sig+i)->mu,&X_minus_mu_mat); // X-mu = out (X,mu,out)
+                        printf("2");
 			arm_mat_trans_f32(&X_minus_mu_mat,&X_minus_mu_mat_tran);
 			arm_mat_mult_f32(&X_minus_mu_mat_tran,(mu_sig+i)->inv,&mat_multi); // A*B = out (A,B,Out)
-
+                        printf("mat_multi: ");
+                        for (int i=0;i<13;i++) {
+                          printf("%f ",mat_multi.pData[i]);
+                        }
+                        printf("\n");
 
 			for(int k = 0;k<n_features;k++) {
 				mat_multi.pData[k] = mat_multi.pData[k]*X_minus_mu_mat.pData[k];
 			}
+                         printf("mat_multi: ");
+                        for (int i=0;i<13;i++) {
+                          printf("%f ",mat_multi.pData[i]);
+                        }
+                        printf("\n");
 			sum_val = 0;
 			for(int n = 0;n<mat_multi.numCols;n++) {
 				sum_val = sum_val + mat_multi.pData[n];
 			}
-
+                        printf("sumval: %f ",sum_val);
+                        printf("C: %f ",C);
+                         speech_HMM[8].det = &speech_det_9;
+                        printf("det: %f ",*((mu_sig+i)->det));
 			(xn_zn->pData[i]) = C - *((mu_sig+i)->det)*0.5 - 0.5*sum_val;
+                         printf("end");
 		}
+                 printf("\n");
+                printf("\n");
 
 }
 
