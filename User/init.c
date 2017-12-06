@@ -20,13 +20,13 @@ arm_matrix_instance_f32 obs_X = {NUMBER_OF_MFCC,1,X};
 
 float32_t speech_path[PATH_LENGTH] = {-1,-1,-1,-1,-1};
 float32_t speech_filtered_path[PATH_LENGTH] = {-1,-1,-1,-1,-1};
-float32_t speech_trans_path[TRANS_PATH_LENGTH] = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+uint8_t speech_trans_path[TRANS_PATH_LENGTH] = {5,5,5,5,5,5,5,5,5,5};
 float32_t speech_logV[NUMBER_OF_STATES] = {-1.38629436357834,0,-301.458422185017,0,-0.693275562691597,0,0,0,-624.356763686620,-315.290308773045,-1.38603764383411};
 //float32_t speech_logV[NUMBER_OF_STATES] = {0.249999999385388,0,0,0,0.499935813054491,0,0,0,0,0,0.250064187560121};
 arm_matrix_instance_f32 speech_logV_mat = {1,NUMBER_OF_STATES,speech_logV};
 arm_matrix_instance_f32 speech_path_mat = {1,PATH_LENGTH,speech_path};
 arm_matrix_instance_f32 speech_filtered_path_mat = {1,PATH_LENGTH,speech_filtered_path};
-arm_matrix_instance_f32 speech_trans_path_mat = {1,TRANS_PATH_LENGTH,speech_trans_path};
+//arm_matrix_instance_f32 speech_trans_path_mat = {1,TRANS_PATH_LENGTH,speech_trans_path};
 
 
 //memcpy(&dest[0],&source[0],sizeof(source));
