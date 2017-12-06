@@ -62,6 +62,7 @@ void DMA1_Channel1_IRQHandler(void)
     memcpy(&adc_sample_buffer_overlap[SAMPLE_BUFFER_LENGTH/2],&adc_sample_buffer[0],sizeof(uint16_t)*SAMPLE_BUFFER_LENGTH/2);
     
     /*Do something here with adc_sample_buffer_overlap*/
+
     
   }
   /*Do the when the buffer is fully filled*/
@@ -73,8 +74,39 @@ void DMA1_Channel1_IRQHandler(void)
     memcpy(&adc_sample_buffer_overlap[SAMPLE_BUFFER_LENGTH/2],&adc_sample_buffer[SAMPLE_BUFFER_LENGTH/2],sizeof(uint16_t)*SAMPLE_BUFFER_LENGTH/2);
 
     /*Do something here with adc_sample_buffer_overlap*/
+
     
   }
+  
+        //Convert to float
+  for(int i=0;i<FRAME_LENGTH;i++) {
+    adc_sample_buffer_overlap_f32[i]=(float32_t)adc_sample_buffer_overlap[i];
+  }
+      
+  
+    preprocessing(adc_sample_buffer_overlap_f32,fft_frame,window,FRAME_LENGTH); // Window and transform
+    simple_mel_extractor_v2(&fft_mat,&MFCC_output_mat); // Extract MFCC
+    logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
+    viterbi_log_NR(&speech_A_mat,&p_xn_zn_mat,&speech_path_mat,&speech_logV_mat,PATH_LENGTH,NUMBER_OF_STATES); //Get path
+    path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
+    trans_path(&speech_filtered_path_mat,speech_trans_path,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
+    
+    for(int i=0;i<10;i++) {
+      printf("%u ",speech_trans_path[i]);
+    }
+    uint8_t outputSequence[NUMBER_OF_WORDS];
+    searchPattern(&outputSequence[0],&speech_trans_path[0],10);
+    uint8_t out[NUMBER_OF_WORDS];
+    sequenceConverter(&out[0],&outputSequence[0],NUMBER_OF_WORDS);
+    
+     printf("\n");
+    for(int i=0;i<NUMBER_OF_WORDS;i++) {
+      printf("%u ",out[i]);
+    }
+    printf("\n");
+    printf("----------------------------------------------\n");
+
+  
 }
 
 /**
@@ -206,8 +238,8 @@ void ADC1_2_IRQHandler(void)
 {
   
 //  /*Clear status flag*/
-//  ADC_ClearFlag(ADC1,ADC_FLAG_EOC);
-//  
+  ADC_ClearFlag(ADC1,ADC_FLAG_EOC);
+  
 //  /*Sample the data*/
 //  if(buttonPressed==1) {
 //    if(SoundCounter<SAMPLE_BUFFER_LENGTH) {

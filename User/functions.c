@@ -23,14 +23,14 @@ struct Word {
 struct Word words[NUMBER_OF_WORDS]; //Struct that contains all words
 
 //Init data
-uint8_t number_of_sequences[NUMBER_OF_WORDS] = {2,2};
+uint8_t number_of_sequences[NUMBER_OF_WORDS] = {4,2};
 uint8_t word_sequence_length[NUMBER_OF_WORDS][MAX_SEQ_PER_WORD]={
-  {4,4},
+  {5,4,6,4},
   {4,8}
 };
 
 uint8_t word_sequences[NUMBER_OF_WORDS][MAX_SEQ_PER_WORD][MAX_SEQUENCES_PER_SEQ] = {
-    {{0,1,0,0},{0,1,1,0}},
+  {{0,1,2,4,1},{1,2,4,1},{0,1,2,4,4,2 },{1,2,4,2}},
     {{2,20,0,0},{2,2,2,0,2,2,2,2}}
  };
 
@@ -56,9 +56,18 @@ float32_t H2[380]={0.500000000000000,1,0.666666666666667,0.333333333333333,0,0,0
 arm_matrix_instance_f32 H2_mat = {20, 19, H2};
 uint8_t H2_start[20]={9,11,14,17,20,23,26,30,34,38,42,47,52,57,63,70,76,84,91,100};
 
+// Define work matrices
 float32_t multi2[20];
 arm_matrix_instance_f32 mat_multi_2 = {20,1,multi2}; 
-
+float32_t Alog[(A_SIZE)]; // init A_plus_logV
+float32_t c[(A_SIZE)]; // Init C
+arm_matrix_instance_f32 A_plus_logV = {NUMBER_OF_STATES,NUMBER_OF_STATES,Alog};
+arm_matrix_instance_f32 C_mat = {NUMBER_OF_STATES,NUMBER_OF_STATES,c};
+float32_t X_minus_mu[NUMBER_OF_MFCC];
+arm_matrix_instance_f32 X_minus_mu_mat = {NUMBER_OF_MFCC,1,X_minus_mu};
+arm_matrix_instance_f32 X_minus_mu_mat_tran = {1,NUMBER_OF_MFCC,X_minus_mu};
+float32_t multi[NUMBER_OF_MFCC];
+arm_matrix_instance_f32 mat_multi = {1,NUMBER_OF_MFCC,multi};
 /*****END MFCC data*******/
 
 
@@ -191,13 +200,9 @@ void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length) {
 }
 
 void logp_xn_zn(arm_matrix_instance_f32 observ,speech *mu_sig,arm_matrix_instance_f32 *xn_zn,uint8_t n_states,uint8_t n_features) {
-		float32_t X_minus_mu[NUMBER_OF_MFCC];
+		
 		float32_t sum_val = 0;
-	    float32_t C =  (-0.5)*n_features*log(2*MATH_PI);
-		arm_matrix_instance_f32 X_minus_mu_mat = {NUMBER_OF_MFCC,1,X_minus_mu};
-		arm_matrix_instance_f32 X_minus_mu_mat_tran = {1,NUMBER_OF_MFCC,X_minus_mu};
-		float32_t multi[NUMBER_OF_MFCC];
-		arm_matrix_instance_f32 mat_multi = {1,NUMBER_OF_MFCC,multi};
+	        float32_t C =  (-0.5)*n_features*log(2*MATH_PI);
 		for(int i = 0;i<n_states;i++) {
 
 			arm_mat_sub_f32(&observ,(mu_sig+i)->mu,&X_minus_mu_mat); // X-mu = out (X,mu,out)
@@ -235,13 +240,11 @@ void MatrixMax(arm_matrix_instance_f32 *C,uint8_t col,float32_t *max,uint16_t *i
 }
 
 void viterbi_log_NR(arm_matrix_instance_f32 *A,arm_matrix_instance_f32 *xn_zn,arm_matrix_instance_f32 *path,arm_matrix_instance_f32 *logV,uint8_t path_length,uint8_t n_states) {
-		float32_t Alog[(A_SIZE)]; // init A_plus_logV
-		float32_t c[(A_SIZE)]; // Init C
+
 		float32_t max_C = 0;
 		uint16_t C_max_ind = 0;
 		uint16_t PATH[NUMBER_OF_STATES];
-		arm_matrix_instance_f32 A_plus_logV = {NUMBER_OF_STATES,NUMBER_OF_STATES,Alog};
-		arm_matrix_instance_f32 C_mat = {NUMBER_OF_STATES,NUMBER_OF_STATES,c};
+
 
 		// Update path
 		// last element in path: *(path+path_length-1);
@@ -329,15 +332,15 @@ void path_filter(arm_matrix_instance_f32 *path,arm_matrix_instance_f32 *filtered
 	}
 }
 
-void trans_path(arm_matrix_instance_f32 *filtered_path,arm_matrix_instance_f32 *trans_path,uint8_t filtered_path_length,uint8_t trans_path_length) {
+void trans_path(arm_matrix_instance_f32 *filtered_path,uint8_t *trans_path,uint8_t filtered_path_length,uint8_t trans_path_length) {
 	if(filtered_path->pData[filtered_path_length-1] == filtered_path->pData[filtered_path_length-2]) {
 		// Do nothing
 	}
 	else {
 		for(int i = 0;i<(trans_path_length-1);i++) {
-			trans_path->pData[i] = trans_path->pData[i+1];// Move all elements on step to the right
+			*(trans_path +i) = *(trans_path +i+1);// Move all elements on step to the right
 		}
-		trans_path->pData[trans_path_length-1] = filtered_path->pData[filtered_path_length-1];
+		*(trans_path + trans_path_length-1) = (uint8_t)(filtered_path->pData[filtered_path_length-1]);
 	}
 }
 
@@ -401,7 +404,7 @@ void run_all() {
 	logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
 	viterbi_log_NR(&speech_A_mat,&p_xn_zn_mat,&speech_path_mat,&speech_logV_mat,PATH_LENGTH,NUMBER_OF_STATES); //Get path
 	path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
-	trans_path(&speech_filtered_path_mat,&speech_trans_path_mat,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
+	trans_path(&speech_filtered_path_mat,speech_trans_path,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
 	}
         
         for(int i=0;i<10;i++) {

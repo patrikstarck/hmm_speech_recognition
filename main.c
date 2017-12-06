@@ -37,6 +37,7 @@ Int32U CriticalSecCntr;
 /*Sampled sound buffers*/
 uint16_t adc_sample_buffer[SAMPLE_BUFFER_LENGTH];
 uint16_t adc_sample_buffer_overlap[SAMPLE_BUFFER_LENGTH];
+float32_t adc_sample_buffer_overlap_f32[SAMPLE_BUFFER_LENGTH];
 
 /*Test data*/
 float32_t frame_power[129]={0.919234219606967,2.33299349351531,131.430411463052,287.644107706566,109.821191588645,1177.15839979831,1631.98871192288,542.286784112919,14.9261526478802,357.488070963738,256.366238185232,15.9533468999523,0.0773882967743689,10.4718856293044,4.90268819166957,17.7434464685045,65.6201858829443,104.297832963192,53.5702458420142,41.4977454398681,47.7401531964056,5.12237769993290,26.7057871455505,12.3960217937510,0.908442463346279,50.6824275382759,130.761660244894,99.3760128206861,11.4236276688786,4.11421266597096,22.3454545119935,43.0858536623546,21.0210262277773,10.9413122538063,19.9410171554077,26.7542587256648,15.9392860198084,8.92455573123926,17.2927367273060,48.7567607657858,34.8416200993278,35.3003230975222,11.8976994492144,0.135004099965742,2.25596250387799,8.96549208736801,4.56297808939745,1.92526520938987,21.4772636252041,46.5798617861815,33.2106276995165,13.5862878392417,6.45570798300452,0.641334244368443,0.0256781713059060,1.76564535654941,0.816176221723345,2.03842540074694,10.9972486310441,14.9479067054754,6.02222354269253,0.766466527983373,4.64035780613468,9.16824932413326,1.35329013527987,14.6112056545833,29.8465396572167,45.0480287207607,67.2252108934342,61.2988669270343,21.5880814818347,15.6914985219066,26.3808345444654,7.08253694663345,3.84897145213686,9.78003126183809,22.2370538945538,24.7375975542727,11.9302898001757,10.5030102647912,9.71489725719142,1.84010958896599,1.91498110469401,5.49579422396884,0.320701349295795,13.7218291795652,13.4372142707041,19.3403210357898,29.8603290156457,7.14934941955385,0.961970212983457,11.3580561244152,43.3401595804555,73.1206439601915,60.3728368246052,10.7006723268295,1.67105053729363,4.33998813426103,1.78299967581777,3.78516963034976,7.45633016925743,8.98236433875215,12.6975475055490,14.8693262500720,14.1362207657299,2.07608368209111,6.22473572320338,14.8560006605914,12.5275105030586,5.51292855778817,6.33497860809764,7.30230464007482,0.929290923060751,11.5866698254924,25.8981166918714,10.7964939946845,0.635147347375397,1.45797095103051,2.18037932959397,4.56989203593712,3.51009724123093,0.292323324335008,0.149172320233589,0.509732538524275,0.719552144199072,0.0617591863918364,0.0764363216977142,0.0103265799445625,0.101216600274090};
@@ -47,51 +48,6 @@ arm_matrix_instance_f32 MFCC_mat = {13,1,MFCC};
 
 void main(void) 
 {
- 
-
-  
-  /*Init the display*/
-// InitDisplay();
-  
-  /* Setup STM32 system (clock, PLL and Flash configuration) */
-  ENTR_CRT_SECTION();
-  SystemInit();
-  EXT_CRT_SECTION();
-
-  //Start and config clocks
-  PRCC_Configuration();
-  
-  //Config GPIO-pins
-  PGPIO_Configuration();
-  
-  enableLed(6);
-  //disableLed(6);
-  
-  //Config NVIC(Nested Vectored Interrupt controller)
-  PRNVIC_Conf();
-  
-  //Config the ADC
-  PADC_Init_func();
-  
-  //Config the DMA
-  PDMA_Configuration();
-  
-  //Config the DAC
-  PDAC_Init_func();
-  
-  //Init the lexicon
-  initLexicon();
-  
-  //Test the lexicon search function
- uint8_t string[22] = {2,2,20,0,0,1,1,0,2,2,2,0,2,2,2,2,2,5,1,4,2,4};
- uint8_t outputSequence[NUMBER_OF_WORDS];
- searchPattern(&outputSequence[0],&string[0],22);
- uint8_t in[6]={4,100,100,100,100,2};
- uint8_t out[6];
- sequenceConverter(&out[0],&in[0],6);
- 
- //Exract mfcc from fft frame
- //simple_mel_extractor_v2(&frame_power_mat,&MFCC_mat);
  
  // Assign vectors to matrices
  speech_HMM[0].mu = &speech_mu_1_mat;
@@ -148,26 +104,75 @@ void main(void)
  speech_HMM[10].sig = &speech_sigma_11_mat;
  speech_HMM[10].det = &speech_det_11;
  speech_HMM[10].inv =	&speech_sigma_inverse_11_mat; 
+  
+  /*Init the display*/
+// InitDisplay();
+  
+  /* Setup STM32 system (clock, PLL and Flash configuration) */
+  ENTR_CRT_SECTION();
+  SystemInit();
+  EXT_CRT_SECTION();
 
-for (int i = 1;i<2*(VEC_LENGTH/FRAME_LENGTH);i++) { // Main loop over length of signal
-		framer(sound_vec,VEC_LENGTH,frame,FRAME_LENGTH,i); // Get new frame
+  //Start and config clocks
+  PRCC_Configuration();
+  
+  //Config GPIO-pins
+  PGPIO_Configuration();
+  
+  enableLed(6);
+  //disableLed(6);
+  
+  //Config NVIC(Nested Vectored Interrupt controller)
+  PRNVIC_Conf();
+  
+  //Config the ADC
+  PADC_Init_func();
+  
+  //Config the DMA
+  PDMA_Configuration();
+  
+  //Config the DAC
+  PDAC_Init_func();
+  
+  //Init the lexicon
+  initLexicon();
+  
+//  //Test the lexicon search function
+// uint8_t string[22] = {2,2,20,0,0,1,1,0,2,2,2,0,2,2,2,2,2,5,1,4,2,4};
+// uint8_t outputSequence[NUMBER_OF_WORDS];
+// searchPattern(&outputSequence[0],&string[0],22);
+// uint8_t in[6]={4,100,100,100,100,2};
+// uint8_t out[6];
+// sequenceConverter(&out[0],&in[0],6);
+ 
+ //Exract mfcc from fft frame
+ //simple_mel_extractor_v2(&frame_power_mat,&MFCC_mat);
+ 
 
-	preprocessing(frame,fft_frame,window,FRAME_LENGTH); // Window and transform
-	simple_mel_extractor_v2(&fft_mat,&MFCC_output_mat); // Extract MFCC
-        for(int i=0;i<13;i++) {
-          printf("%f ",MFCC_output_mat.pData[i]);
-        }
-        printf("\n");
-	logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
-	viterbi_log_NR(&speech_A_mat,&p_xn_zn_mat,&speech_path_mat,&speech_logV_mat,PATH_LENGTH,NUMBER_OF_STATES); //Get path
-	path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
-	trans_path(&speech_filtered_path_mat,&speech_trans_path_mat,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
-	}
-        
-        for(int i=0;i<10;i++) {
-          
-          printf("%f ",speech_trans_path_mat.pData[i]);
-        }
+
+//for (int i = 1;i<2*(VEC_LENGTH/FRAME_LENGTH);i++) { // Main loop over length of signal
+//		framer(sound_vec,VEC_LENGTH,frame,FRAME_LENGTH,i); // Get new frame
+//
+//	preprocessing(frame,fft_frame,window,FRAME_LENGTH); // Window and transform
+//	simple_mel_extractor_v2(&fft_mat,&MFCC_output_mat); // Extract MFCC
+//	logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
+//	viterbi_log_NR(&speech_A_mat,&p_xn_zn_mat,&speech_path_mat,&speech_logV_mat,PATH_LENGTH,NUMBER_OF_STATES); //Get path
+//	path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
+//	trans_path(&speech_filtered_path_mat,speech_trans_path,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
+//	}
+//        
+//        for(int i=0;i<10;i++) {
+//          printf("%u ",speech_trans_path[i]);
+//        }
+//        uint8_t outputSequence[NUMBER_OF_WORDS];
+//        searchPattern(&outputSequence[0],&speech_trans_path[0],10);
+//        uint8_t out[NUMBER_OF_WORDS];
+//        sequenceConverter(&out[0],&outputSequence[0],NUMBER_OF_WORDS);
+//        
+//         printf("\n");
+//        for(int i=0;i<NUMBER_OF_WORDS;i++) {
+//          printf("%u ",out[i]);
+//        }
   
 while (1)
   {
@@ -424,7 +429,7 @@ void PADC_Init_func(void )
   ADC_Init(ADC1, &ADC_InitStructure);
 
   /* ADC1 regular channel6 configuration *///The sampling cycles can be modified for better(or worse) result
-  ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_7Cycles5); 
+  ADC_RegularChannelConfig(ADC1, ADC_Channel_6, 1, ADC_SampleTime_7Cycles5); 
 
   /* Enable ADC1 DMA */
   ADC_DMACmd(ADC1, ENABLE);

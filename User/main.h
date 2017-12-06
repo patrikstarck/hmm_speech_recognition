@@ -27,6 +27,7 @@
 
 extern uint16_t adc_sample_buffer[SAMPLE_BUFFER_LENGTH];
 extern uint16_t adc_sample_buffer_overlap[SAMPLE_BUFFER_LENGTH];
+extern float32_t adc_sample_buffer_overlap_f32[SAMPLE_BUFFER_LENGTH];
 
 void PGPIO_Configuration(void);
 void PDAC_Init_func(void);

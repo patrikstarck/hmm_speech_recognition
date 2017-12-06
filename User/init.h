@@ -23,7 +23,7 @@ extern arm_matrix_instance_f32 obs_X;
 
 extern float32_t speech_path[PATH_LENGTH];
 extern float32_t speech_filtered_path[PATH_LENGTH];
-extern float32_t speech_trans_path[TRANS_PATH_LENGTH];
+extern uint8_t speech_trans_path[TRANS_PATH_LENGTH];
 extern float32_t speech_logV[NUMBER_OF_STATES];
 extern arm_matrix_instance_f32 speech_logV_mat;
 extern arm_matrix_instance_f32 speech_path_mat;
