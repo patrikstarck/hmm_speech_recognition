@@ -6,13 +6,14 @@
 // Define hmm struct
 
 //Define struct
-typedef struct speech {
+typedef struct speech speech;
+struct speech{
 	arm_matrix_instance_f32* mu;
 	arm_matrix_instance_f32* sig;
 	arm_matrix_instance_f32* inv;
 	float32_t* det;
 
-}speech;
+};
 
 /*Defines*/
 #define NUMBER_OF_WORDS 2
@@ -25,7 +26,7 @@ typedef struct speech {
 #define PATH_LENGTH 5
 #define TRANS_PATH_LENGTH 10
 #define FRAME_LENGTH 256
-#define VEC_LENGTH 10000
+#define VEC_LENGTH 9000
 
 /*MFCC*/
 void simple_mel_extractor_v2(arm_matrix_instance_f32 *frame_power, arm_matrix_instance_f32 *MFCC_mat);

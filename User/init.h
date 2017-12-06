@@ -34,7 +34,7 @@ extern arm_matrix_instance_f32 speech_trans_path_mat;
 //memcpy(&dest[0],&source[0],sizeof(source));
 
 
-extern speech speech_HMM[NUMBER_OF_STATES];
+extern struct speech speech_HMM[NUMBER_OF_STATES];
 
 extern float32_t speech_mu_1[NUMBER_OF_MFCC];
 extern float32_t speech_mu_2[NUMBER_OF_MFCC];
