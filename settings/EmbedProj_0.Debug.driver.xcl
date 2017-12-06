@@ -12,7 +12,7 @@
 
 "--device=STM32F107VC" 
 
-"--drv_communication_log=C:\Users\patri\Google Drive\Skola\Projekt i IS (5hp)\Projekt IB - Clean Speech\15hp\IAR Programmering\EmbedProj_0.1\cspycomm.log" 
+"--drv_communication_log=D:\Git\hmm_speech_recognition\cspycomm.log" 
 
 "--drv_communication=USB0" 
 

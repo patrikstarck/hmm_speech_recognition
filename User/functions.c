@@ -57,6 +57,8 @@ float32_t H2[380]={0.500000000000000,1,0.666666666666667,0.333333333333333,0,0,0
 arm_matrix_instance_f32 H2_mat = {20, 19, H2};
 uint8_t H2_start[20]={9,11,14,17,20,23,26,30,34,38,42,47,52,57,63,70,76,84,91,100};
 
+  float32_t multi2[20];
+  arm_matrix_instance_f32 mat_multi_2 = {20,1,multi2}; 
 
 /*****END MFCC data*******/
 
@@ -77,25 +79,24 @@ uint8_t H2_start[20]={9,11,14,17,20,23,26,30,34,38,42,47,52,57,63,70,76,84,91,10
 void simple_mel_extractor_v2(arm_matrix_instance_f32 *frame_power, arm_matrix_instance_f32 *MFCC_mat) {
 
   //Multiply with H(fancy way)
-  float32_t multi[20];
-  arm_matrix_instance_f32 mat_multi = {20,1,multi}; 
+
   for(int i=0;i<20;i++) {
     float32_t tmp_sum = 0;
-    for(int j=0;j<H2_ROW_LENGTH;j++) {
+    for(int j=0;j<H2_ROW_LENGTH-1;j++) {
       tmp_sum = tmp_sum + ((*(frame_power->pData+H2_start[i]+j))*H2[i*H2_ROW_LENGTH+j]);
     }
-    *(mat_multi.pData+i)=tmp_sum;
+    *(mat_multi_2.pData+i)=tmp_sum;
   }
 
 //  arm_mat_mult_f32(&H_mat,frame_power,&mat_multi);  //Heavier way to multiply with H 
     
   //Log
   for(int i=0;i<20;i++) {
-    *(mat_multi.pData+i)=log(*(mat_multi.pData+i));
+    *(mat_multi_2.pData+i)=log(*(mat_multi_2.pData+i));
   }
 
   //DCT
-  arm_mat_mult_f32(&DCT_mat,&mat_multi,MFCC_mat);
+  arm_mat_mult_f32(&DCT_mat,&mat_multi_2,MFCC_mat);
 
   //Ceplifter
   for(int i=0;i<13;i++) {
@@ -195,26 +196,44 @@ void logp_xn_zn(arm_matrix_instance_f32 observ,speech *mu_sig,arm_matrix_instanc
 		float32_t X_minus_mu[NUMBER_OF_MFCC];
 		float32_t sum_val = 0;
 	    float32_t C =  (-0.5)*n_features*log(2*MATH_PI);
-		arm_matrix_instance_f32 X_minus_mu_mat = {n_features,1,X_minus_mu};
-		arm_matrix_instance_f32 X_minus_mu_mat_tran = {1,n_features,X_minus_mu};
+		arm_matrix_instance_f32 X_minus_mu_mat = {NUMBER_OF_MFCC,1,X_minus_mu};
+		arm_matrix_instance_f32 X_minus_mu_mat_tran = {1,NUMBER_OF_MFCC,X_minus_mu};
 		float32_t multi[NUMBER_OF_MFCC];
-		arm_matrix_instance_f32 mat_multi = {1,n_features,multi};
+		arm_matrix_instance_f32 mat_multi = {1,NUMBER_OF_MFCC,multi};
 		for(int i = 0;i<n_states;i++) {
+                  printf("n_state: ");
+                  printf("1");
 			arm_mat_sub_f32(&observ,(mu_sig+i)->mu,&X_minus_mu_mat); // X-mu = out (X,mu,out)
+                        printf("2");
 			arm_mat_trans_f32(&X_minus_mu_mat,&X_minus_mu_mat_tran);
 			arm_mat_mult_f32(&X_minus_mu_mat_tran,(mu_sig+i)->inv,&mat_multi); // A*B = out (A,B,Out)
-
+                        printf("mat_multi: ");
+                        for (int i=0;i<13;i++) {
+                          printf("%f ",mat_multi.pData[i]);
+                        }
+                        printf("\n");
 
 			for(int k = 0;k<n_features;k++) {
 				mat_multi.pData[k] = mat_multi.pData[k]*X_minus_mu_mat.pData[k];
 			}
+                         printf("mat_multi: ");
+                        for (int i=0;i<13;i++) {
+                          printf("%f ",mat_multi.pData[i]);
+                        }
+                        printf("\n");
 			sum_val = 0;
 			for(int n = 0;n<mat_multi.numCols;n++) {
 				sum_val = sum_val + mat_multi.pData[n];
 			}
-
+                        printf("sumval: %f ",sum_val);
+                        printf("C: %f ",C);
+                         speech_HMM[8].det = &speech_det_9;
+                        printf("det: %f ",*((mu_sig+i)->det));
 			(xn_zn->pData[i]) = C - *((mu_sig+i)->det)*0.5 - 0.5*sum_val;
+                         printf("end");
 		}
+                 printf("\n");
+                printf("\n");
 
 }
 
@@ -390,60 +409,7 @@ void preprocessing(float32_t *frame,float32_t *fft_frame,float32_t *window,int f
 
 void run_all() {
 	
-	speech_HMM[0].mu = &speech_mu_1_mat;
-	speech_HMM[0].sig = &speech_sigma_1_mat;
-	speech_HMM[0].det = &speech_det_1;
-	speech_HMM[0].inv =	&speech_sigma_inverse_1_mat;
-
-	speech_HMM[1].mu = &speech_mu_2_mat;
-	speech_HMM[1].sig = &speech_sigma_2_mat;
-	speech_HMM[1].det = &speech_det_2;
-	speech_HMM[1].inv =	&speech_sigma_inverse_2_mat;
-
-	speech_HMM[2].mu = &speech_mu_3_mat;
-	speech_HMM[2].sig = &speech_sigma_3_mat;
-	speech_HMM[2].det = &speech_det_3;
-	speech_HMM[2].inv =	&speech_sigma_inverse_3_mat;
-
-	speech_HMM[3].mu = &speech_mu_4_mat;
-	speech_HMM[3].sig = &speech_sigma_4_mat;
-	speech_HMM[3].det = &speech_det_4;
-	speech_HMM[3].inv =	&speech_sigma_inverse_4_mat;
-
-	speech_HMM[4].mu = &speech_mu_5_mat;
-	speech_HMM[4].sig = &speech_sigma_5_mat;
-	speech_HMM[4].det = &speech_det_5;
-	speech_HMM[4].inv =	&speech_sigma_inverse_5_mat;
-
-	speech_HMM[5].mu = &speech_mu_6_mat;
-	speech_HMM[5].sig = &speech_sigma_6_mat;
-	speech_HMM[5].det = &speech_det_6;
-	speech_HMM[5].inv =	&speech_sigma_inverse_6_mat;
-
-	speech_HMM[6].mu = &speech_mu_7_mat;
-	speech_HMM[6].sig = &speech_sigma_7_mat;
-	speech_HMM[6].det = &speech_det_7;
-	speech_HMM[6].inv =	&speech_sigma_inverse_7_mat;
-
-	speech_HMM[7].mu = &speech_mu_8_mat;
-	speech_HMM[7].sig = &speech_sigma_8_mat;
-	speech_HMM[7].det = &speech_det_8;
-	speech_HMM[7].inv =	&speech_sigma_inverse_8_mat;
-
-	speech_HMM[8].mu = &speech_mu_9_mat;
-	speech_HMM[8].sig = &speech_sigma_9_mat;
-	speech_HMM[8].det = &speech_det_9;
-	speech_HMM[8].inv =	&speech_sigma_inverse_9_mat;
-
-	speech_HMM[9].mu = &speech_mu_10_mat;
-	speech_HMM[9].sig = &speech_sigma_10_mat;
-	speech_HMM[9].det = &speech_det_10;
-	speech_HMM[9].inv =	&speech_sigma_inverse_10_mat;
-
-	speech_HMM[10].mu = &speech_mu_11_mat;
-	speech_HMM[10].sig = &speech_sigma_11_mat;
-	speech_HMM[10].det = &speech_det_11;
-	speech_HMM[10].inv =	&speech_sigma_inverse_11_mat;
+	
 	
 	for (int i = 1;i<2*(VEC_LENGTH/FRAME_LENGTH);i++) { // Main loop over length of signal
 		framer(sound_vec,VEC_LENGTH,frame,FRAME_LENGTH,i); // Get new frame
@@ -455,6 +421,12 @@ void run_all() {
 	path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
 	trans_path(&speech_filtered_path_mat,&speech_trans_path_mat,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
 	}
+        
+        for(int i=0;i<10;i++) {
+          
+          printf("%f ",speech_trans_path_mat.pData[i]);
+        }
+        
 }
 
 
