@@ -1,4 +1,4 @@
-// Heder 
+// Heder
 
 // Init all variables
 #ifndef FUNCTIONS_H_
