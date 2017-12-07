@@ -37,6 +37,7 @@ void sequenceConverter(uint8_t* outSequence, uint8_t* inSequence, uint8_t length
 void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length);
 void searchCommando(uint8_t* output, uint8_t* sequence,uint8_t seq_length);
 void initLanguageModel(void);
+void preEmphasis(float32_t *in_vec,int length_in_vec,float32_t *out_vec);
 
 
 #endif /* joels_h */

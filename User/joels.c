@@ -197,7 +197,7 @@ void searchCommando(uint8_t* output, uint8_t* sequence,uint8_t seq_length) {
 }
 
 
-
+//simple FIR-filter for pre-emphasise voice signals
 void preEmphasis(float32_t *in_vec,int length_in_vec,float32_t *out_vec){
     float32_t b = -0.97;
     *out_vec = *in_vec;
