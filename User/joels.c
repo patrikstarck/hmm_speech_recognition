@@ -195,3 +195,14 @@ void searchCommando(uint8_t* output, uint8_t* sequence,uint8_t seq_length) {
         }
     }
 }
+
+
+
+void preEmphasis(float32_t *in_vec,int length_in_vec,float32_t *out_vec){
+    float32_t b = -0.97;
+    *out_vec = *in_vec;
+    for(int i=1;i<length_in_vec;i++){
+        *(out_vec+i)=*(in_vec+i) + *(in_vec+i-1)*b;
+    }
+}
+
