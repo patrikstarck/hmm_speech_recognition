@@ -23,15 +23,15 @@ struct Word {
 struct Word words[NUMBER_OF_WORDS]; //Struct that contains all words
 
 //Init data
-uint8_t number_of_sequences[NUMBER_OF_WORDS] = {4,2};
+uint8_t number_of_sequences[NUMBER_OF_WORDS] = {4,5};
 uint8_t word_sequence_length[NUMBER_OF_WORDS][MAX_SEQ_PER_WORD]={
   {5,4,6,4},
-  {4,8}
+  {4,5,4,5,4}
 };
 
 uint8_t word_sequences[NUMBER_OF_WORDS][MAX_SEQ_PER_WORD][MAX_SEQUENCES_PER_SEQ] = {
   {{0,1,2,4,1},{1,2,4,1},{0,1,2,4,4,2 },{1,2,4,2}},
-    {{2,20,0,0},{2,2,2,0,2,2,2,2}}
+  {{10,0,8,10},{10,0,6,8,10},{10,0,6,10},{10,2,6,8,10},{10,2,6,10}}
  };
 
 /******END Lexicon data**********/

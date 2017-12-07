@@ -30,7 +30,13 @@ uint16_t buttonPressed = 0;
 /*Output*/
 uint16_t playback_soundBuffer_index = 0;
 void outputSound() ;
+  unsigned int cnt1 = 0;
+unsigned int cnt2 = 0;
 
+/***/
+uint8_t prev_state=0;
+void saveBuffer();
+/**/
 
 /** @addtogroup Template_Project
   * @{
@@ -51,6 +57,8 @@ void outputSound() ;
 /*Interrupts from DMA-channel when half filled and filled*/
 void DMA1_Channel1_IRQHandler(void)
 {
+          cnt2 = TIM7->CNT; 
+//        printf("cnt1:%u cnt2:%u diff:%u \n",cnt1,cnt2,cnt2-cnt1);
   
   /*Do the when the buffer is half filled*/
   if(DMA_GetFlagStatus(DMA1_FLAG_HT1) != RESET) { 
@@ -74,13 +82,18 @@ void DMA1_Channel1_IRQHandler(void)
     memcpy(&adc_sample_buffer_overlap[SAMPLE_BUFFER_LENGTH/2],&adc_sample_buffer[SAMPLE_BUFFER_LENGTH/2],sizeof(uint16_t)*SAMPLE_BUFFER_LENGTH/2);
 
     /*Do something here with adc_sample_buffer_overlap*/
-
+   // saveBuffer();
     
   }
   
+
+
+
+
+
         //Convert to float
   for(int i=0;i<FRAME_LENGTH;i++) {
-    adc_sample_buffer_overlap_f32[i]=(float32_t)adc_sample_buffer_overlap[i];
+    adc_sample_buffer_overlap_f32[i]=(((float32_t)adc_sample_buffer_overlap[i]) - 2043);
   }
       
   
@@ -91,20 +104,27 @@ void DMA1_Channel1_IRQHandler(void)
     path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
     trans_path(&speech_filtered_path_mat,speech_trans_path,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
     
-    for(int i=0;i<10;i++) {
-      printf("%u ",speech_trans_path[i]);
-    }
-    uint8_t outputSequence[NUMBER_OF_WORDS];
-    searchPattern(&outputSequence[0],&speech_trans_path[0],10);
-    uint8_t out[NUMBER_OF_WORDS];
-    sequenceConverter(&out[0],&outputSequence[0],NUMBER_OF_WORDS);
     
-     printf("\n");
-    for(int i=0;i<NUMBER_OF_WORDS;i++) {
-      printf("%u ",out[i]);
+    if(prev_state!=speech_trans_path[9]) {
+      prev_state=speech_trans_path[9];
+      printf("%u ",speech_trans_path[9]);
     }
-    printf("\n");
-    printf("----------------------------------------------\n");
+//    for(int i=0;i<10;i++) {
+//      printf("%u ",speech_trans_path[i]);
+//    }
+//    uint8_t outputSequence[NUMBER_OF_WORDS];
+//    searchPattern(&outputSequence[0],&speech_trans_path[0],10);
+//    uint8_t out[NUMBER_OF_WORDS];
+//    sequenceConverter(&out[0],&outputSequence[0],NUMBER_OF_WORDS);
+//    
+//     printf("\n");
+//    for(int i=0;i<NUMBER_OF_WORDS;i++) {
+//      printf("%u ",out[i]);
+//    }
+//    printf("\n");
+//    printf("----------------------------------------------\n");
+    
+cnt1 = TIM7->CNT;
 
   
 }
@@ -238,7 +258,7 @@ void ADC1_2_IRQHandler(void)
 {
   
 //  /*Clear status flag*/
-  ADC_ClearFlag(ADC1,ADC_FLAG_EOC);
+ // ADC_ClearFlag(ADC1,ADC_FLAG_EOC);
   
 //  /*Sample the data*/
 //  if(buttonPressed==1) {
@@ -258,12 +278,12 @@ void ADC1_2_IRQHandler(void)
 
 
 ///*Save the whole sound buffer to terminal*/
-//void saveBuffer() {
-//  for(int i=0;i<SAMPLE_BUFFER_LENGTH;i++) {
-//    printf("%d ",adc_sample_buffer[i]);
-//  }
-//
-//}
+void saveBuffer() {
+  for(int i=0;i<SAMPLE_BUFFER_LENGTH;i++) {
+    printf("%d ",adc_sample_buffer[i]);
+  }
+
+}
 
 ///*Calculate FFT on the buffer*/
 void doFft(uint16_t *source, uint16_t length) {
@@ -315,8 +335,8 @@ void outputSound() {
   if(playback_soundBuffer_index>=SAMPLE_BUFFER_LENGTH) {
     playback_soundBuffer_index=0;
   }
-  *(u32*)(DAC_DHR12L2_Address)=(u32)adc_sample_buffer[playback_soundBuffer_index];
-  *(u32*)(DAC_DHR12L1_Address)=(u32)adc_sample_buffer[playback_soundBuffer_index];
+//  *(u32*)(DAC_DHR12L2_Address)=(u32)adc_sample_buffer[playback_soundBuffer_index];
+//  *(u32*)(DAC_DHR12L1_Address)=(u32)adc_sample_buffer[playback_soundBuffer_index];
 }
 
 //Interrupts from TIM6-channel

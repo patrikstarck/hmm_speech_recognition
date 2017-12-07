@@ -296,17 +296,28 @@ void PDAC_Init_func(void) {
   TIM_ITConfig(TIM6, TIM_FLAG_Update, ENABLE);
   
   /* DAC channel1 Configuration */
- // DAC_InitStructure.DAC_Trigger = DAC_Trigger_T6_TRGO; //No trigger currently for DAC. Is instead triggered when writing to register
+  DAC_InitStructure.DAC_Trigger = DAC_Trigger_T3_TRGO; //No trigger currently for DAC. Is instead triggered when writing to register
   DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
   DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
-  DAC_Init(DAC_Channel_1, &DAC_InitStructure);
-  DAC_Init(DAC_Channel_2, &DAC_InitStructure);
   
-  /* Enable DAC Channel1 */
+  
+    /* Enable DAC Channel1 */
   DAC_Cmd(DAC_Channel_1, ENABLE);
 
   /* Enable DAC Channel2 */
   DAC_Cmd(DAC_Channel_2, ENABLE);
+  
+   
+  /* Enable DMA for DAC Channel2 */
+  DAC_DMACmd(DAC_Channel_1, ENABLE);
+  
+  DAC_Init(DAC_Channel_1, &DAC_InitStructure);
+  DAC_Init(DAC_Channel_2, &DAC_InitStructure);
+  
+
+  
+  
+
 }
 
 void PRCC_Configuration(void)
@@ -429,7 +440,7 @@ void PADC_Init_func(void )
   ADC_Init(ADC1, &ADC_InitStructure);
 
   /* ADC1 regular channel6 configuration *///The sampling cycles can be modified for better(or worse) result
-  ADC_RegularChannelConfig(ADC1, ADC_Channel_6, 1, ADC_SampleTime_7Cycles5); 
+  ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_7Cycles5); 
 
   /* Enable ADC1 DMA */
   ADC_DMACmd(ADC1, ENABLE);
@@ -481,7 +492,28 @@ void PDMA_Configuration() {
   DMA_Init(DMA1_Channel1, &DMA_InitStructure);
   DMA_ITConfig(DMA1_Channel1, DMA_IT_HT, ENABLE);
   DMA_ITConfig(DMA1_Channel1, DMA_IT_TC, ENABLE);
-  DMA_Cmd(DMA1_Channel1, ENABLE);        
+  DMA_Cmd(DMA1_Channel1, ENABLE);       
+  
+  
+    /* DMA2 channel3 configuration */
+  DMA_DeInit(DMA1_Channel2);
+  DMA_InitStructure.DMA_PeripheralBaseAddr = *(u32*)(DAC_DHR12L2_Address);//(uint32_t)&ADC1->DR; //Address to ADC-buffer
+  DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&adc_sample_buffer[0]; //Address to memory buffer
+  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST ; //Peripheral to memoery
+  DMA_InitStructure.DMA_BufferSize = SAMPLE_BUFFER_LENGTH; //Size of buffer
+  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable; //Address of input is always the same
+  DMA_InitStructure.DMA_MemoryInc =DMA_MemoryInc_Enable ; //Increment memory address automatically
+  DMA_InitStructure.DMA_PeripheralDataSize =  DMA_PeripheralDataSize_HalfWord ; //16bit, do not change
+  DMA_InitStructure.DMA_MemoryDataSize =  DMA_MemoryDataSize_HalfWord ; //16bit, do not change
+  DMA_InitStructure.DMA_Mode = DMA_Mode_Circular; //Refill after filled
+  DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+  DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
+  
+  /*Enable, init and start*/
+  DMA_Init(DMA1_Channel2, &DMA_InitStructure);
+//  DMA_ITConfig(DMA1_Channel2 DMA_IT_HT, ENABLE);
+//  DMA_ITConfig(DMA1_Channel2, DMA_IT_TC, ENABLE);
+  DMA_Cmd(DMA1_Channel2, ENABLE);       
 }
 
 /*************************************************************************
