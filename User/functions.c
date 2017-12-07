@@ -34,8 +34,20 @@ uint8_t word_sequences[NUMBER_OF_WORDS][MAX_SEQ_PER_WORD][MAX_SEQUENCES_PER_SEQ]
   {{10,0,8,10},{10,0,6,8,10},{10,0,6,10},{10,2,6,8,10},{10,2,6,10}}
  };
 
-/******END Lexicon data**********/
+//Init data language model
+struct Word commands[NUMBER_OF_COMMANDS];
+uint8_t number_of_command_seq[NUMBER_OF_COMMANDS] = {2,2};
+uint8_t command_seq_length[NUMBER_OF_COMMANDS][MAX_SEQ_PER_COMMAND] = {
+    {2,2},
+    {2,2}
+};
 
+uint8_t command_sequences[NUMBER_OF_COMMANDS][MAX_SEQ_PER_COMMAND][MAX_SEQUENCES_PER_SEQ] = {
+    {{0,1},{1,0}},
+    {{0,2},{2,0}}
+};
+
+/******END Lexicon data**********/
 
 
 /********************/
@@ -198,6 +210,76 @@ void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length) {
   }
 
 }
+
+/*******************/
+/*Language model functions*/
+/*******************/
+
+void initLanguageModel() {
+    //Loop through number of words
+    for (int j=0;j<NUMBER_OF_COMMANDS;j++) {
+        //For each word, loop through number of sequence
+        for(int i=0;i<number_of_command_seq[j];i++) {
+            //Add the seqences to the struct array
+            words[j].pho_seq[i] = &(command_sequences[j][i][0]);
+            words[j].length[i]=command_seq_length[j][i];
+        }
+        commands[j].nSeq=number_of_command_seq[j];
+    }
+}
+
+void searchCommando(uint8_t* output, uint8_t* sequence,uint8_t seq_length) {
+    
+    //Loop through all commands
+    for (int j=0;j<NUMBER_OF_COMMANDS;j++) {
+        *(output+j) = 100;
+        //Loop through all sequences for each command
+        for(int i=0;i<commands[j].nSeq;i++) {
+            
+            //Only find one sequence per command
+            if(*(output+j)!= 100) {
+                break;
+            }
+            
+            uint8_t compareIndex = 0;
+            for (int k=0;k<seq_length;k++) {
+                if(*(sequence+k)== *(commands[j].pho_seq[i]+compareIndex)) {
+                    compareIndex++;
+                    
+                    //command found?
+                    if(compareIndex==commands[j].length[i]) {
+                        //things happen
+                        //if more commands are added, add another if-statement
+                        if(j==0){
+                            //turn on lights
+                            *(output+j)=1;
+                            enableLed(6);
+                        }else if(j==1){
+                            //turn off lights
+                            *(output+j)=0;
+                            disableLed(6);
+                        }
+                        //erase word sequence buffer
+                        for(int t=0;t<seq_length;t++){
+                            *(sequence+t) = 0;
+                        }
+                        break;
+                    }
+                }
+                else {
+                    compareIndex = 0;
+                    if(*(sequence+k)== *(commands[j].pho_seq[i]+compareIndex)) {
+                        compareIndex++;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*******************/
+/*End language model functions*/
+/*******************/
 
 void logp_xn_zn(arm_matrix_instance_f32 observ,speech *mu_sig,arm_matrix_instance_f32 *xn_zn,uint8_t n_states,uint8_t n_features) {
 		

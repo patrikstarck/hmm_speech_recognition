@@ -35,6 +35,8 @@ void simple_mel_extractor_v2(arm_matrix_instance_f32 *frame_power, arm_matrix_in
 void initLexicon() ;
 void sequenceConverter(uint8_t* outSequence, uint8_t* inSequence, uint8_t length);
 void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length);
+void searchCommando(uint8_t* output, uint8_t* sequence,uint8_t seq_length) ;
+void initLanguageModel();
 void framer(float32_t *in_vec,int length_in_vec,float32_t *frame,int frame_length,int frame_nr);
 void windower(float32_t *window,float32_t *frame,int frame_length);
 void preprocessing(float32_t *frame,float32_t *fft_frame,float32_t *window,int frame_size);
