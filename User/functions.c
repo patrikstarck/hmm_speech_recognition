@@ -315,7 +315,7 @@ void MatrixMax(arm_matrix_instance_f32 *C,uint8_t col,float32_t *max,uint16_t *i
 		*max = C->pData[col];
 		for(int i = 1;i<C->numRows;i++) {
 			maxvalue = C->pData[i*(C->numCols)+col];
-			if(maxvalue>*max && *max > -1000000000) {
+			if(maxvalue>*max && maxvalue != -1000000000) {
 				*max = maxvalue;
 				*ind = i;
 			}
@@ -329,7 +329,7 @@ void MatVecMax(arm_matrix_instance_f32 *C,float32_t *max,uint16_t *ind) {
 		*max = C->pData[0];
 		for(int i = 1;i<C->numCols ;i++) {
 			maxvalue = C->pData[i];
-			if(maxvalue>*max && *max > -1000000000) {
+			if(maxvalue>*max && maxvalue != -1000000000) {
 				*max = maxvalue;
 				*ind = i;
 			}
@@ -364,7 +364,7 @@ void viterbi_log_NR(arm_matrix_instance_f32 *A,arm_matrix_instance_f32 *xn_zn,ar
 
 		for(int i = 0;i<(n_states);i++) {
 			for(int k = 0;k<n_states;k++) {
-				if (A_plus_logV.pData[k+i*n_states] == 0) {
+				if (A_plus_logV.pData[k+i*n_states] == -1000000000) {
 					C_mat.pData[k*n_states+i] = -1000000000;
 				}
 				else {
