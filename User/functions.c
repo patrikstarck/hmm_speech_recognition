@@ -90,6 +90,14 @@ arm_matrix_instance_f32 mat_multi = {1,NUMBER_OF_MFCC,multi};
 /********FUNCTIONS**********/
 /***************************/
 
+//simple FIR-filter for pre-emphasise voice signals
+void preEmphasis(float32_t *in_vec,int length_in_vec,float32_t *out_vec){
+    float32_t b = -0.97;
+    *out_vec = *in_vec;
+    for(int i=1;i<length_in_vec;i++){
+        *(out_vec+i)=*(in_vec+i) + *(in_vec+i-1)*b;
+    }
+}
 
 
 /***************/
@@ -437,14 +445,14 @@ void framer(float32_t *in_vec,int length_in_vec,float32_t *frame,int frame_lengt
 			if(odd == 1) {
 				frame_nr = (frame_nr/2)+1;
 				for(int i = (frame_nr-1)*frame_length;i<(frame_length*frame_nr);i++) {
-					*(frame+frame_index) = *(in_vec+i)*32768;
+					*(frame+frame_index) = *(in_vec+i)*32768;//(*(in_vec+i)-2048)*32.7*2.5;
 					frame_index++;
 				}
 			}
 			if(odd == 0) {
 				frame_nr = (frame_nr/2);
 				for(int i = ((frame_nr-1)*frame_length+128);i<((frame_length*frame_nr)+128);i++) {
-					*(frame+frame_index) = *(in_vec+i)*32768;
+					*(frame+frame_index) = *(in_vec+i)*32768;//(*(in_vec+i)-2048)*32.7*2.5;
 					frame_index++;
 				}
 			}
@@ -478,8 +486,9 @@ void preprocessing(float32_t *frame,float32_t *fft_frame,float32_t *window,int f
 	arm_rfft_fast_init_f32(&S_RFFT_1, frame_size);
 	arm_rfft_fast_f32(&S_RFFT_1, &frame[0],&fft_frame[0],0);
 	arm_cmplx_mag_squared_f32(&fft_frame[0], &fft_frame[0], frame_size/2);
-
-	float32_t fm = 10000/returnMax(&fft_frame[0],frame_size/2);
+        
+    float32_t fm= 10000/returnMax(&fft_frame[0],frame_size/2);
+        
 
 	for(int i = 0;i<(frame_size/2+1);i++) {
 		*(fft_frame+i) = *(fft_frame+i)*fm;
@@ -508,4 +517,3 @@ void run_all() {
         }
         
 }
-
