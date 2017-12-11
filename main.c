@@ -38,6 +38,9 @@ Int32U CriticalSecCntr;
 uint16_t adc_sample_buffer[SAMPLE_BUFFER_LENGTH];
 uint16_t adc_sample_buffer_overlap[SAMPLE_BUFFER_LENGTH];
 float32_t adc_sample_buffer_overlap_f32[SAMPLE_BUFFER_LENGTH];
+float32_t adc_sample_buffer_overlap_f32_2[SAMPLE_BUFFER_LENGTH];
+uint32_t memoryAddr1;
+extern uint8_t prev_state;
 
 /*Test data*/
 float32_t frame_power[129]={0.919234219606967,2.33299349351531,131.430411463052,287.644107706566,109.821191588645,1177.15839979831,1631.98871192288,542.286784112919,14.9261526478802,357.488070963738,256.366238185232,15.9533468999523,0.0773882967743689,10.4718856293044,4.90268819166957,17.7434464685045,65.6201858829443,104.297832963192,53.5702458420142,41.4977454398681,47.7401531964056,5.12237769993290,26.7057871455505,12.3960217937510,0.908442463346279,50.6824275382759,130.761660244894,99.3760128206861,11.4236276688786,4.11421266597096,22.3454545119935,43.0858536623546,21.0210262277773,10.9413122538063,19.9410171554077,26.7542587256648,15.9392860198084,8.92455573123926,17.2927367273060,48.7567607657858,34.8416200993278,35.3003230975222,11.8976994492144,0.135004099965742,2.25596250387799,8.96549208736801,4.56297808939745,1.92526520938987,21.4772636252041,46.5798617861815,33.2106276995165,13.5862878392417,6.45570798300452,0.641334244368443,0.0256781713059060,1.76564535654941,0.816176221723345,2.03842540074694,10.9972486310441,14.9479067054754,6.02222354269253,0.766466527983373,4.64035780613468,9.16824932413326,1.35329013527987,14.6112056545833,29.8465396572167,45.0480287207607,67.2252108934342,61.2988669270343,21.5880814818347,15.6914985219066,26.3808345444654,7.08253694663345,3.84897145213686,9.78003126183809,22.2370538945538,24.7375975542727,11.9302898001757,10.5030102647912,9.71489725719142,1.84010958896599,1.91498110469401,5.49579422396884,0.320701349295795,13.7218291795652,13.4372142707041,19.3403210357898,29.8603290156457,7.14934941955385,0.961970212983457,11.3580561244152,43.3401595804555,73.1206439601915,60.3728368246052,10.7006723268295,1.67105053729363,4.33998813426103,1.78299967581777,3.78516963034976,7.45633016925743,8.98236433875215,12.6975475055490,14.8693262500720,14.1362207657299,2.07608368209111,6.22473572320338,14.8560006605914,12.5275105030586,5.51292855778817,6.33497860809764,7.30230464007482,0.929290923060751,11.5866698254924,25.8981166918714,10.7964939946845,0.635147347375397,1.45797095103051,2.18037932959397,4.56989203593712,3.51009724123093,0.292323324335008,0.149172320233589,0.509732538524275,0.719552144199072,0.0617591863918364,0.0764363216977142,0.0103265799445625,0.101216600274090};
@@ -49,7 +52,32 @@ arm_matrix_instance_f32 MFCC_mat = {13,1,MFCC};
 void main(void) 
 {
  
- // Assign vectors to matrices
+
+// 
+//  speech_HMM[11].mu = &speech_mu_12_mat;
+// speech_HMM[11].sig = &speech_sigma_12_mat;
+// speech_HMM[11].det = &speech_det_12;
+// speech_HMM[11].inv =	&speech_sigma_inverse_12_mat; 
+// 
+//  speech_HMM[12].mu = &speech_mu_13_mat;
+// speech_HMM[12].sig = &speech_sigma_13_mat;
+// speech_HMM[12].det = &speech_det_13;
+// speech_HMM[12].inv =	&speech_sigma_inverse_13_mat; 
+// 
+//  speech_HMM[13].mu = &speech_mu_14_mat;
+// speech_HMM[13].sig = &speech_sigma_14_mat;
+// speech_HMM[13].det = &speech_det_14;
+// speech_HMM[13].inv =	&speech_sigma_inverse_14_mat; 
+  
+  /*Init the display*/
+// InitDisplay();
+  
+  /* Setup STM32 system (clock, PLL and Flash configuration) */
+  ENTR_CRT_SECTION();
+  SystemInit();
+  EXT_CRT_SECTION();
+  
+   // Assign vectors to matrices
  speech_HMM[0].mu = &speech_mu_1_mat;
  speech_HMM[0].sig = &speech_sigma_1_mat;
  speech_HMM[0].det = &speech_det_1;
@@ -89,29 +117,52 @@ void main(void)
  speech_HMM[7].sig = &speech_sigma_8_mat;
  speech_HMM[7].det = &speech_det_8;
  speech_HMM[7].inv =	&speech_sigma_inverse_8_mat;
+ 
+ 
+ 
+ for (int i = 1;i<2*(VEC_LENGTH/FRAME_LENGTH);i++) { // Main loop over length of signal
+		framer(sound_vec,VEC_LENGTH,frame,FRAME_LENGTH,i); // Get new frame
 
- speech_HMM[8].mu = &speech_mu_9_mat;
- speech_HMM[8].sig = &speech_sigma_9_mat;
- speech_HMM[8].det = &speech_det_9;
- speech_HMM[8].inv =	&speech_sigma_inverse_9_mat;
+	preprocessing(frame,fft_frame,window,FRAME_LENGTH); // Window and transform
+	simple_mel_extractor_v2(&fft_mat,&MFCC_output_mat); // Extract MFCC
+	logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
+	viterbi_log_NR(&speech_A_mat,&p_xn_zn_mat,&speech_path_mat,&speech_logV_mat,PATH_LENGTH,NUMBER_OF_STATES); //Get path
+	path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
+	trans_path(&speech_filtered_path_mat,speech_trans_path,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
+        if(prev_state!=speech_trans_path[9]) {
+      prev_state=speech_trans_path[9];
+      
+    }
+      printf("%u ",speech_trans_path[9]);
+	}
+        
+//        for(int i=0;i<10;i++) {
+//          printf("%u ",speech_trans_path[i]);
+//        }
+//        uint8_t outputSequence[NUMBER_OF_WORDS];
+//        searchPattern(&outputSequence[0],&speech_trans_path[0],10);
+//        uint8_t out[NUMBER_OF_WORDS];
+//        sequenceConverter(&out[0],&outputSequence[0],NUMBER_OF_WORDS);
+//        
+//         printf("\n");
+//        for(int i=0;i<NUMBER_OF_WORDS;i++) {
+//          printf("%u ",out[i]);
+//        }
 
- speech_HMM[9].mu = &speech_mu_10_mat;
- speech_HMM[9].sig = &speech_sigma_10_mat;
- speech_HMM[9].det = &speech_det_10;
- speech_HMM[9].inv =	&speech_sigma_inverse_10_mat;
-
- speech_HMM[10].mu = &speech_mu_11_mat;
- speech_HMM[10].sig = &speech_sigma_11_mat;
- speech_HMM[10].det = &speech_det_11;
- speech_HMM[10].inv =	&speech_sigma_inverse_11_mat; 
-  
-  /*Init the display*/
-// InitDisplay();
-  
-  /* Setup STM32 system (clock, PLL and Flash configuration) */
-  ENTR_CRT_SECTION();
-  SystemInit();
-  EXT_CRT_SECTION();
+// speech_HMM[8].mu = &speech_mu_9_mat;
+// speech_HMM[8].sig = &speech_sigma_9_mat;
+// speech_HMM[8].det = &speech_det_9;
+// speech_HMM[8].inv =	&speech_sigma_inverse_9_mat;
+//
+// speech_HMM[9].mu = &speech_mu_10_mat;
+// speech_HMM[9].sig = &speech_sigma_10_mat;
+// speech_HMM[9].det = &speech_det_10;
+// speech_HMM[9].inv =	&speech_sigma_inverse_10_mat;
+//
+// speech_HMM[10].mu = &speech_mu_11_mat;
+// speech_HMM[10].sig = &speech_sigma_11_mat;
+// speech_HMM[10].det = &speech_det_11;
+// speech_HMM[10].inv =	&speech_sigma_inverse_11_mat; 
 
   //Start and config clocks
   PRCC_Configuration();
@@ -128,12 +179,13 @@ void main(void)
   //Config the ADC
   PADC_Init_func();
   
+    //Config the DAC
+  PDAC_Init_func();
+  
   //Config the DMA
   PDMA_Configuration();
   
-  //Config the DAC
-  PDAC_Init_func();
-  
+
   //Init the lexicon
   initLexicon();
   
@@ -150,29 +202,7 @@ void main(void)
  
 
 
-//for (int i = 1;i<2*(VEC_LENGTH/FRAME_LENGTH);i++) { // Main loop over length of signal
-//		framer(sound_vec,VEC_LENGTH,frame,FRAME_LENGTH,i); // Get new frame
-//
-//	preprocessing(frame,fft_frame,window,FRAME_LENGTH); // Window and transform
-//	simple_mel_extractor_v2(&fft_mat,&MFCC_output_mat); // Extract MFCC
-//	logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
-//	viterbi_log_NR(&speech_A_mat,&p_xn_zn_mat,&speech_path_mat,&speech_logV_mat,PATH_LENGTH,NUMBER_OF_STATES); //Get path
-//	path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
-//	trans_path(&speech_filtered_path_mat,speech_trans_path,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
-//	}
-//        
-//        for(int i=0;i<10;i++) {
-//          printf("%u ",speech_trans_path[i]);
-//        }
-//        uint8_t outputSequence[NUMBER_OF_WORDS];
-//        searchPattern(&outputSequence[0],&speech_trans_path[0],10);
-//        uint8_t out[NUMBER_OF_WORDS];
-//        sequenceConverter(&out[0],&outputSequence[0],NUMBER_OF_WORDS);
-//        
-//         printf("\n");
-//        for(int i=0;i<NUMBER_OF_WORDS;i++) {
-//          printf("%u ",out[i]);
-//        }
+
   
 while (1)
   {
@@ -293,13 +323,17 @@ void PDAC_Init_func(void) {
   /* TIM6 enable counter */
   TIM_Cmd(TIM6, ENABLE);
   
-  TIM_ITConfig(TIM6, TIM_FLAG_Update, ENABLE);
+  
+//  TIM_ITConfig(TIM6, TIM_FLAG_Update, ENABLE);
   
   /* DAC channel1 Configuration */
-  DAC_InitStructure.DAC_Trigger = DAC_Trigger_T3_TRGO; //No trigger currently for DAC. Is instead triggered when writing to register
+  DAC_InitStructure.DAC_Trigger = DAC_Trigger_T6_TRGO; //No trigger currently for DAC. Is instead triggered when writing to register
   DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
-  DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
+  DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Disable;
   
+    
+  DAC_Init(DAC_Channel_1, &DAC_InitStructure);
+  DAC_Init(DAC_Channel_2, &DAC_InitStructure);
   
     /* Enable DAC Channel1 */
   DAC_Cmd(DAC_Channel_1, ENABLE);
@@ -310,13 +344,6 @@ void PDAC_Init_func(void) {
    
   /* Enable DMA for DAC Channel2 */
   DAC_DMACmd(DAC_Channel_1, ENABLE);
-  
-  DAC_Init(DAC_Channel_1, &DAC_InitStructure);
-  DAC_Init(DAC_Channel_2, &DAC_InitStructure);
-  
-
-  
-  
 
 }
 
@@ -331,6 +358,7 @@ void PRCC_Configuration(void)
 
   /* DMA1 clock enable */
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA2, ENABLE);
 
   /* Enable ADC1  clock */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 , ENABLE);
@@ -375,6 +403,14 @@ void PRNVIC_Conf(void)
   //Enable DMA2 channel 3 IRQ Channel */
   //This is for DMA-interrupts
   NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel1_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+  
+    //Enable DMA2 channel 1 IRQ Channel */
+  //This is for DMA-interrupts
+  NVIC_InitStructure.NVIC_IRQChannel = DMA2_Channel1_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -494,11 +530,13 @@ void PDMA_Configuration() {
   DMA_ITConfig(DMA1_Channel1, DMA_IT_TC, ENABLE);
   DMA_Cmd(DMA1_Channel1, ENABLE);       
   
+  memoryAddr1 = (uint32_t)&adc_sample_buffer[0];
+ // uint32_t memoryAddr2=(uint32_t)&memoryAddr1;
   
     /* DMA2 channel3 configuration */
-  DMA_DeInit(DMA1_Channel2);
-  DMA_InitStructure.DMA_PeripheralBaseAddr = *(u32*)(DAC_DHR12L2_Address);//(uint32_t)&ADC1->DR; //Address to ADC-buffer
-  DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)&adc_sample_buffer[0]; //Address to memory buffer
+  DMA_DeInit(DMA2_Channel3);
+  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(DAC_DHR12L1_Address);//(uint32_t)&ADC1->DR; //Address to ADC-buffer
+  DMA_InitStructure.DMA_MemoryBaseAddr = memoryAddr1; //Address to memory buffer
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST ; //Peripheral to memoery
   DMA_InitStructure.DMA_BufferSize = SAMPLE_BUFFER_LENGTH; //Size of buffer
   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable; //Address of input is always the same
@@ -510,10 +548,10 @@ void PDMA_Configuration() {
   DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
   
   /*Enable, init and start*/
-  DMA_Init(DMA1_Channel2, &DMA_InitStructure);
+  DMA_Init(DMA2_Channel3, &DMA_InitStructure);
 //  DMA_ITConfig(DMA1_Channel2 DMA_IT_HT, ENABLE);
-//  DMA_ITConfig(DMA1_Channel2, DMA_IT_TC, ENABLE);
-  DMA_Cmd(DMA1_Channel2, ENABLE);       
+  DMA_ITConfig(DMA2_Channel3, DMA_IT_TC, ENABLE);
+  DMA_Cmd(DMA2_Channel3, ENABLE);       
 }
 
 /*************************************************************************

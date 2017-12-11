@@ -9,11 +9,13 @@
 #ifndef joels_h
 #define joels_h
 
+
+#include "includes.h"
+
 #include <stdio.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <ctype.h>
 
 /*Defines*/
@@ -32,9 +34,9 @@
 #define VEC_LENGTH 9000
 
 /*Lexicon*/
-void initLexicon(void) ;
-void sequenceConverter(uint8_t* outSequence, uint8_t* inSequence, uint8_t length);
-void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length);
+//void initLexicon(void) ;
+//void sequenceConverter(uint8_t* outSequence, uint8_t* inSequence, uint8_t length);
+//void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length);
 void searchCommando(uint8_t* output, uint8_t* sequence,uint8_t seq_length);
 void initLanguageModel(void);
 void preEmphasis(float32_t *in_vec,int length_in_vec,float32_t *out_vec);

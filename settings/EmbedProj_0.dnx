@@ -16,7 +16,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>3988940650</Checksum>
+        <Checksum>3632747394</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -75,29 +75,6 @@
         <Title2>DMA_ClearFlag</Title2>
         <Setup2>0 2 0 0 1 0 0 0 4294967295</Setup2>
     </DataStripe>
-    <Interrupts>
-        <Enabled>1</Enabled>
-    </Interrupts>
-    <MemConfig>
-        <Base>1</Base>
-        <Manual>0</Manual>
-        <Ddf>1</Ddf>
-        <TypeViol>0</TypeViol>
-        <Stop>1</Stop>
-    </MemConfig>
-    <Simulator>
-        <Freq>10000000</Freq>
-        <FreqHi>0</FreqHi>
-        <MultiCoreRunAll>1</MultiCoreRunAll>
-    </Simulator>
-    <array_types>
-        <Fmt0>uint8_t *[20]	4	0</Fmt0>
-        <Fmt1>uint8_t[10]	3	0</Fmt1>
-    </array_types>
-    <watch_formats>
-        <Fmt0>{W}42:output	4	0</Fmt0>
-        <Fmt1>{W}42:path_uint8[1]	3	0</Fmt1>
-    </watch_formats>
     <Trace1>
         <Enabled>0</Enabled>
         <ShowSource>1</ShowSource>
@@ -116,29 +93,6 @@
         <EventLSU>0</EventLSU>
         <EventSLEEP>0</EventSLEEP>
     </SWOTraceWindow>
-    <DataLog>
-        <Title_0>prev_state</Title_0>
-        <Symbol_0>0 1 0</Symbol_0>
-        <Title_1>simple_mel_extractor_v2</Title_1>
-        <Symbol_1>0 4 1</Symbol_1>
-        <Title_2>DMAHtControllFlag</Title_2>
-        <Symbol_2>0 1 0</Symbol_2>
-        <Title_3>DMA_ClearFlag</Title_3>
-        <Symbol_3>0 4 1</Symbol_3>
-        <LogEnabled>1</LogEnabled>
-        <GraphEnabled>1</GraphEnabled>
-        <ShowTimeLog>1</ShowTimeLog>
-        <SumEnabled>0</SumEnabled>
-        <ShowTimeSum>1</ShowTimeSum>
-    </DataLog>
-    <InterruptLog>
-        <LogEnabled>0</LogEnabled>
-        <GraphEnabled>0</GraphEnabled>
-        <ShowTimeLog>0</ShowTimeLog>
-        <SumEnabled>0</SumEnabled>
-        <ShowTimeSum>1</ShowTimeSum>
-        <SumSortOrder>0</SumSortOrder>
-    </InterruptLog>
     <EventLog>
         <Title_0>Ch3</Title_0>
         <Symbol_0>0 0 1</Symbol_0>
@@ -155,27 +109,63 @@
         <ShowTimeSum>1</ShowTimeSum>
         <SumSortOrder>0</SumSortOrder>
     </EventLog>
+    <array_types>
+        <Fmt0>uint8_t *[20]	4	0</Fmt0>
+        <Fmt1>uint8_t[10]	3	0</Fmt1>
+    </array_types>
+    <watch_formats>
+        <Fmt0>{W}42:memoryAddr1	4	0</Fmt0>
+        <Fmt1>{W}42:output	4	0</Fmt1>
+        <Fmt2>{W}42:path_uint8[1]	3	0</Fmt2>
+    </watch_formats>
+    <InterruptLog>
+        <LogEnabled>0</LogEnabled>
+        <GraphEnabled>0</GraphEnabled>
+        <ShowTimeLog>0</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+        <SumSortOrder>0</SumSortOrder>
+    </InterruptLog>
+    <DataLog>
+        <Title_0>prev_state</Title_0>
+        <Symbol_0>0 1 0</Symbol_0>
+        <Title_1>simple_mel_extractor_v2</Title_1>
+        <Symbol_1>0 4 1</Symbol_1>
+        <Title_2>DMAHtControllFlag</Title_2>
+        <Symbol_2>0 1 0</Symbol_2>
+        <Title_3>DMA_ClearFlag</Title_3>
+        <Symbol_3>0 4 1</Symbol_3>
+        <LogEnabled>1</LogEnabled>
+        <GraphEnabled>1</GraphEnabled>
+        <ShowTimeLog>1</ShowTimeLog>
+        <SumEnabled>0</SumEnabled>
+        <ShowTimeSum>1</ShowTimeSum>
+    </DataLog>
     <DisassembleMode>
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Bp0>_ 1 "EMUL_DATA_LOG" "prev_state" 0 0</Bp0>
-        <Count>1</Count>
+        <Bp0>_ 1 "STD_CODE2" "{$PROJ_DIR$\main.c}.168.3" 0 0 1 "" 0 ""</Bp0>
+        <Bp1>_ 1 "STD_CODE2" "{$PROJ_DIR$\main.c}.127.2" 0 0 1 "" 0 ""</Bp1>
+        <Bp2>_ 1 "STD_CODE2" "{$PROJ_DIR$\main.c}.128.2" 0 0 1 "" 0 ""</Bp2>
+        <Bp3>_ 1 "STD_CODE2" "{$PROJ_DIR$\main.c}.129.2" 0 0 1 "" 0 ""</Bp3>
+        <Bp4>_ 1 "STD_CODE2" "{$PROJ_DIR$\main.c}.131.2" 0 0 1 "" 0 ""</Bp4>
+        <Bp5>_ 1 "STD_CODE2" "{$PROJ_DIR$\main.c}.130.2" 0 0 1 "" 0 ""</Bp5>
+        <Bp6>_ 1 "STD_CODE2" "{$PROJ_DIR$\User\functions.c}.277.11" 0 0 1 "" 0 ""</Bp6>
+        <Bp7>_ 1 "STD_CODE2" "{$PROJ_DIR$\User\functions.c}.300.15" 0 0 1 "" 0 ""</Bp7>
+        <Bp8>_ 1 "STD_CODE2" "{$PROJ_DIR$\User\functions.c}.309.3" 0 0 1 "" 0 ""</Bp8>
+        <Count>9</Count>
     </Breakpoints2>
-    <LogFile>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ ""</LogFile>
-        <Category>_ 0</Category>
-    </LogFile>
-    <TermIOLog>
-        <LoggingEnabled>_ 1</LoggingEnabled>
-        <LogFile>_ "C:\Users\patri\Desktop\TermIO2.log"</LogFile>
-    </TermIOLog>
-    <Aliases>
-        <A0>_ "G:\Dropbox\Patrik\Skola\Project IS\EmbedProj_0.1\Core Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\iar\startup_stm32f10x_cl.s" ""</A0>
-        <Count>1</Count>
-        <SuppressDialog>0</SuppressDialog>
-    </Aliases>
+    <Interrupts>
+        <Enabled>1</Enabled>
+    </Interrupts>
+    <MemConfig>
+        <Base>1</Base>
+        <Manual>0</Manual>
+        <Ddf>1</Ddf>
+        <TypeViol>0</TypeViol>
+        <Stop>1</Stop>
+    </MemConfig>
     <DriverProfiling>
         <Enabled>0</Enabled>
         <Mode>1</Mode>
@@ -189,4 +179,23 @@
     <CallStackStripe>
         <ShowTiming>1</ShowTiming>
     </CallStackStripe>
+    <LogFile>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+        <Category>_ 0</Category>
+    </LogFile>
+    <TermIOLog>
+        <LoggingEnabled>_ 1</LoggingEnabled>
+        <LogFile>_ "C:\Users\patri\Desktop\TermIO3.log"</LogFile>
+    </TermIOLog>
+    <Aliases>
+        <A0>_ "G:\Dropbox\Patrik\Skola\Project IS\EmbedProj_0.1\Core Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\iar\startup_stm32f10x_cl.s" ""</A0>
+        <Count>1</Count>
+        <SuppressDialog>0</SuppressDialog>
+    </Aliases>
+    <Simulator>
+        <Freq>10000000</Freq>
+        <FreqHi>0</FreqHi>
+        <MultiCoreRunAll>1</MultiCoreRunAll>
+    </Simulator>
 </settings>

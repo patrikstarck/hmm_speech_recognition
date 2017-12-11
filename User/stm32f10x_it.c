@@ -53,6 +53,12 @@ void saveBuffer();
 /*            Cortex-M3 Processor Exceptions Handlers                         */
 /******************************************************************************/
     
+    
+    
+    void DMA2_Channel1_IRQHandler(void)
+{
+  uint8_t tmp =1;
+}
 
 /*Interrupts from DMA-channel when half filled and filled*/
 void DMA1_Channel1_IRQHandler(void)
@@ -82,7 +88,7 @@ void DMA1_Channel1_IRQHandler(void)
     memcpy(&adc_sample_buffer_overlap[SAMPLE_BUFFER_LENGTH/2],&adc_sample_buffer[SAMPLE_BUFFER_LENGTH/2],sizeof(uint16_t)*SAMPLE_BUFFER_LENGTH/2);
 
     /*Do something here with adc_sample_buffer_overlap*/
-   // saveBuffer();
+  //  saveBuffer();
     
   }
   
@@ -93,10 +99,10 @@ void DMA1_Channel1_IRQHandler(void)
 
         //Convert to float
   for(int i=0;i<FRAME_LENGTH;i++) {
-    adc_sample_buffer_overlap_f32[i]=(((float32_t)adc_sample_buffer_overlap[i]) - 2043);
+    adc_sample_buffer_overlap_f32[i]=(((float32_t)adc_sample_buffer_overlap[i]) - 2048)*32;
   }
-      
   
+  preEmphasis(&adc_sample_buffer_overlap_f32[0], FRAME_LENGTH, &adc_sample_buffer_overlap_f32_2[0]);
     preprocessing(adc_sample_buffer_overlap_f32,fft_frame,window,FRAME_LENGTH); // Window and transform
     simple_mel_extractor_v2(&fft_mat,&MFCC_output_mat); // Extract MFCC
     logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
@@ -107,8 +113,9 @@ void DMA1_Channel1_IRQHandler(void)
     
     if(prev_state!=speech_trans_path[9]) {
       prev_state=speech_trans_path[9];
-      printf("%u ",speech_trans_path[9]);
+      
     }
+    printf("%u ",speech_trans_path[9]);
 //    for(int i=0;i<10;i++) {
 //      printf("%u ",speech_trans_path[i]);
 //    }
