@@ -358,7 +358,7 @@ void viterbi_log_NR(arm_matrix_instance_f32 *A,arm_matrix_instance_f32 *xn_zn,ar
 
 		for(int i = 0;i<(n_states);i++) {
 			for(int k = 0;k<n_states;k++) { // FIX IF: A->pData[k+i*n_states] = 0
-				if(A->pData[k*n_states+i] == 0 || logV->pData[k] == 0) {
+                          if(A->pData[k*n_states+i] == 0){// || logV->pData[k] == 0) {
 					A_plus_logV.pData[k*n_states+i] = -1000000000;
 				}
 				else {

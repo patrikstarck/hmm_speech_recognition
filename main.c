@@ -118,24 +118,39 @@ void main(void)
  speech_HMM[7].det = &speech_det_8;
  speech_HMM[7].inv =	&speech_sigma_inverse_8_mat;
  
- 
- 
- for (int i = 1;i<2*(VEC_LENGTH/FRAME_LENGTH);i++) { // Main loop over length of signal
-		framer(sound_vec,VEC_LENGTH,frame,FRAME_LENGTH,i); // Get new frame
+  speech_HMM[8].mu = &speech_mu_9_mat;
+ speech_HMM[8].sig = &speech_sigma_9_mat;
+ speech_HMM[8].det = &speech_det_9;
+ speech_HMM[8].inv =	&speech_sigma_inverse_9_mat;
 
-	preprocessing(frame,fft_frame,window,FRAME_LENGTH); // Window and transform
-	simple_mel_extractor_v2(&fft_mat,&MFCC_output_mat); // Extract MFCC
-	logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
-	viterbi_log_NR(&speech_A_mat,&p_xn_zn_mat,&speech_path_mat,&speech_logV_mat,PATH_LENGTH,NUMBER_OF_STATES); //Get path
-	path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
-	trans_path(&speech_filtered_path_mat,speech_trans_path,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
-        if(prev_state!=speech_trans_path[9]) {
-      prev_state=speech_trans_path[9];
-      
-    }
-      printf("%u ",speech_trans_path[9]);
-	}
-        
+ speech_HMM[9].mu = &speech_mu_10_mat;
+ speech_HMM[9].sig = &speech_sigma_10_mat;
+ speech_HMM[9].det = &speech_det_10;
+ speech_HMM[9].inv =	&speech_sigma_inverse_10_mat;
+
+ speech_HMM[10].mu = &speech_mu_11_mat;
+ speech_HMM[10].sig = &speech_sigma_11_mat;
+ speech_HMM[10].det = &speech_det_11;
+ speech_HMM[10].inv =	&speech_sigma_inverse_11_mat; 
+ 
+ 
+ 
+// for (int i = 1;i<2*(VEC_LENGTH/FRAME_LENGTH);i++) { // Main loop over length of signal
+//		framer(sound_vec,VEC_LENGTH,frame,FRAME_LENGTH,i); // Get new frame
+//
+//	preprocessing(frame,fft_frame,window,FRAME_LENGTH); // Window and transform
+//	simple_mel_extractor_v2(&fft_mat,&MFCC_output_mat); // Extract MFCC
+//	logp_xn_zn(MFCC_output_mat,speech_HMM,&p_xn_zn_mat,NUMBER_OF_STATES,NUMBER_OF_MFCC); // Calculate B
+//	viterbi_log_NR(&speech_A_mat,&p_xn_zn_mat,&speech_path_mat,&speech_logV_mat,PATH_LENGTH,NUMBER_OF_STATES); //Get path
+//	path_filter(&speech_path_mat,&speech_filtered_path_mat,PATH_LENGTH); // Filter Path
+//	trans_path(&speech_filtered_path_mat,speech_trans_path,PATH_LENGTH,TRANS_PATH_LENGTH); // Get transfer path
+//        if(prev_state!=speech_trans_path[9]) {
+//      prev_state=speech_trans_path[9];
+//      
+//    }
+//      printf("%u ",speech_trans_path[9]);
+//	}
+//        
 //        for(int i=0;i<10;i++) {
 //          printf("%u ",speech_trans_path[i]);
 //        }
@@ -149,20 +164,7 @@ void main(void)
 //          printf("%u ",out[i]);
 //        }
 
-// speech_HMM[8].mu = &speech_mu_9_mat;
-// speech_HMM[8].sig = &speech_sigma_9_mat;
-// speech_HMM[8].det = &speech_det_9;
-// speech_HMM[8].inv =	&speech_sigma_inverse_9_mat;
-//
-// speech_HMM[9].mu = &speech_mu_10_mat;
-// speech_HMM[9].sig = &speech_sigma_10_mat;
-// speech_HMM[9].det = &speech_det_10;
-// speech_HMM[9].inv =	&speech_sigma_inverse_10_mat;
-//
-// speech_HMM[10].mu = &speech_mu_11_mat;
-// speech_HMM[10].sig = &speech_sigma_11_mat;
-// speech_HMM[10].det = &speech_det_11;
-// speech_HMM[10].inv =	&speech_sigma_inverse_11_mat; 
+
 
   //Start and config clocks
   PRCC_Configuration();

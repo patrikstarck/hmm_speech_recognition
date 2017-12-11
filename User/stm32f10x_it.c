@@ -88,7 +88,7 @@ void DMA1_Channel1_IRQHandler(void)
     memcpy(&adc_sample_buffer_overlap[SAMPLE_BUFFER_LENGTH/2],&adc_sample_buffer[SAMPLE_BUFFER_LENGTH/2],sizeof(uint16_t)*SAMPLE_BUFFER_LENGTH/2);
 
     /*Do something here with adc_sample_buffer_overlap*/
-  //  saveBuffer();
+   // saveBuffer();
     
   }
   
@@ -99,7 +99,7 @@ void DMA1_Channel1_IRQHandler(void)
 
         //Convert to float
   for(int i=0;i<FRAME_LENGTH;i++) {
-    adc_sample_buffer_overlap_f32[i]=(((float32_t)adc_sample_buffer_overlap[i]) - 2048)*32;
+    adc_sample_buffer_overlap_f32[i]=(((float32_t)adc_sample_buffer_overlap[i]) - 2048);
   }
   
   preEmphasis(&adc_sample_buffer_overlap_f32[0], FRAME_LENGTH, &adc_sample_buffer_overlap_f32_2[0]);
