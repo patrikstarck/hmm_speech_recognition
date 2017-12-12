@@ -51,7 +51,10 @@ arm_matrix_instance_f32 MFCC_mat = {13,1,MFCC};
 
 void main(void) 
 {
- 
+    //Init the lexicon
+  initLexicon();
+  initLanguageModel();
+  
 
 // 
 //  speech_HMM[11].mu = &speech_mu_12_mat;
@@ -172,7 +175,7 @@ void main(void)
   //Config GPIO-pins
   PGPIO_Configuration();
   
-  enableLed(6);
+ // enableLed(6);
   //disableLed(6);
   
   //Config NVIC(Nested Vectored Interrupt controller)
@@ -188,8 +191,7 @@ void main(void)
   PDMA_Configuration();
   
 
-  //Init the lexicon
-  initLexicon();
+
   
 //  //Test the lexicon search function
 // uint8_t string[22] = {2,2,20,0,0,1,1,0,2,2,2,0,2,2,2,2,2,5,1,4,2,4};

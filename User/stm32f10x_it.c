@@ -112,25 +112,34 @@ void DMA1_Channel1_IRQHandler(void)
     
     
     if(prev_state!=speech_trans_path[9]) {
-      prev_state=speech_trans_path[9];
-      
+        prev_state=speech_trans_path[9];
     }
-    printf("%u ",speech_trans_path[9]);
-//    for(int i=0;i<10;i++) {
-//      printf("%u ",speech_trans_path[i]);
-//    }
-//    uint8_t outputSequence[NUMBER_OF_WORDS];
-//    searchPattern(&outputSequence[0],&speech_trans_path[0],10);
-//    uint8_t out[NUMBER_OF_WORDS];
-//    sequenceConverter(&out[0],&outputSequence[0],NUMBER_OF_WORDS);
-//    
-//     printf("\n");
-//    for(int i=0;i<NUMBER_OF_WORDS;i++) {
-//      printf("%u ",out[i]);
-//    }
-//    printf("\n");
-//    printf("----------------------------------------------\n");
+      
     
+//    
+//  //    for(int i=0;i<10;i++) {
+//  //      printf("%u ",speech_trans_path[i]);
+//  //    }
+//      uint8_t outputSequence[NUMBER_OF_WORDS];
+//      searchPattern(&outputSequence[0],&speech_trans_path[0],10);
+//      uint8_t out[NUMBER_OF_WORDS];
+//      sequenceConverter(&out[0],&outputSequence[0],NUMBER_OF_WORDS);
+//      languageBuffer(&lang_buff[0], &out[0],2, NUMBER_OF_WORDS);
+//      searchCommando(&lang_buff[0],2);
+//       
+////      
+////     //  printf("\n");
+//      for(int i=0;i<NUMBER_OF_WORDS;i++) {
+//        printf("%u ",out[i]);
+//      }
+//      printf("\n");
+//      for(int i=0;i<2;i++) {
+//        printf("%u ",lang_buff[i]);
+//      }
+//       printf("\n");
+//      printf("----------------------------------------------\n");
+//    }
+      printf("%u ",speech_trans_path[9]);
 cnt1 = TIM7->CNT;
 
   
