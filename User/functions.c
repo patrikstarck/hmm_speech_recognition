@@ -228,6 +228,19 @@ void initLanguageModel() {
     }
 }
 
+void languageBuffer(uint8_t* lang_buff, uint8_t* input,uint8_t output_length, uint8_t input_length){
+    for(i=0;i<input_length;i++){
+        if(*(input+i)!=100){
+            for(k=0;k<output_length;k++){
+                if(*(output+k)==100){
+                    *(lang_buff+k)=*(input+i);
+                }
+            }
+        }
+    }
+        
+}
+
 void searchCommando(uint8_t* output, uint8_t* sequence,uint8_t seq_length) {
     
     //Loop through all commands
@@ -252,16 +265,16 @@ void searchCommando(uint8_t* output, uint8_t* sequence,uint8_t seq_length) {
                         //if more commands are added, add another if-statement
                         if(j==0){
                             //turn on lights
-                            *(output+j)=1;
+                            //*(output+j)=1;
                             enableLed(6);
                         }else if(j==1){
                             //turn off lights
-                            *(output+j)=0;
+                            //*(output+j)=0;
                             disableLed(6);
                         }
                         //erase word sequence buffer
-                        for(int t=0;t<seq_length;t++){
-                            *(sequence+t) = 0;
+                        for(int t=(k-compareIndex);t<compareIndex;t++){
+                            *(sequence+t) = 100;
                         }
                         break;
                     }
