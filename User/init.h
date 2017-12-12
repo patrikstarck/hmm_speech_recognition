@@ -47,6 +47,9 @@ extern float32_t speech_mu_8[NUMBER_OF_MFCC];
 extern float32_t speech_mu_9[NUMBER_OF_MFCC];
 extern float32_t speech_mu_10[NUMBER_OF_MFCC];
 extern float32_t speech_mu_11[NUMBER_OF_MFCC];
+extern float32_t speech_mu_12[NUMBER_OF_MFCC];
+extern float32_t speech_mu_13[NUMBER_OF_MFCC];
+extern float32_t speech_mu_14[NUMBER_OF_MFCC];
 
 extern arm_matrix_instance_f32 speech_mu_1_mat;
 extern arm_matrix_instance_f32 speech_mu_2_mat;
@@ -59,6 +62,9 @@ extern arm_matrix_instance_f32 speech_mu_8_mat;
 extern arm_matrix_instance_f32 speech_mu_9_mat;
 extern arm_matrix_instance_f32 speech_mu_10_mat;
 extern arm_matrix_instance_f32 speech_mu_11_mat;
+extern arm_matrix_instance_f32 speech_mu_12_mat;
+extern arm_matrix_instance_f32 speech_mu_13_mat;
+extern arm_matrix_instance_f32 speech_mu_14_mat;
 
 extern float32_t speech_sigma_1[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 extern float32_t speech_sigma_2[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
@@ -71,6 +77,9 @@ extern float32_t speech_sigma_8[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 extern float32_t speech_sigma_9[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 extern float32_t speech_sigma_10[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 extern float32_t speech_sigma_11[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
+extern float32_t speech_sigma_12[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
+extern float32_t speech_sigma_13[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
+extern float32_t speech_sigma_14[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 
 extern arm_matrix_instance_f32 speech_sigma_1_mat;
 extern arm_matrix_instance_f32 speech_sigma_2_mat;
@@ -83,6 +92,9 @@ extern arm_matrix_instance_f32 speech_sigma_8_mat;
 extern arm_matrix_instance_f32 speech_sigma_9_mat;
 extern arm_matrix_instance_f32 speech_sigma_10_mat;
 extern arm_matrix_instance_f32 speech_sigma_11_mat;
+extern arm_matrix_instance_f32 speech_sigma_12_mat;
+extern arm_matrix_instance_f32 speech_sigma_13_mat;
+extern arm_matrix_instance_f32 speech_sigma_14_mat;
 
 extern float32_t speech_sigma_inverse_1[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 extern float32_t speech_sigma_inverse_2[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
@@ -95,6 +107,9 @@ extern float32_t speech_sigma_inverse_8[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 extern float32_t speech_sigma_inverse_9[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 extern float32_t speech_sigma_inverse_10[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 extern float32_t speech_sigma_inverse_11[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
+extern float32_t speech_sigma_inverse_12[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
+extern float32_t speech_sigma_inverse_13[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
+extern float32_t speech_sigma_inverse_14[(NUMBER_OF_MFCC*NUMBER_OF_MFCC)];
 
 extern arm_matrix_instance_f32 speech_sigma_inverse_1_mat;
 extern arm_matrix_instance_f32 speech_sigma_inverse_2_mat;
@@ -107,6 +122,9 @@ extern arm_matrix_instance_f32 speech_sigma_inverse_8_mat;
 extern arm_matrix_instance_f32 speech_sigma_inverse_9_mat;
 extern arm_matrix_instance_f32 speech_sigma_inverse_10_mat;
 extern arm_matrix_instance_f32 speech_sigma_inverse_11_mat;
+extern arm_matrix_instance_f32 speech_sigma_inverse_12_mat;
+extern arm_matrix_instance_f32 speech_sigma_inverse_13_mat;
+extern arm_matrix_instance_f32 speech_sigma_inverse_14_mat;
 
 extern float32_t speech_det_1;
 extern float32_t speech_det_2;
@@ -119,6 +137,9 @@ extern float32_t speech_det_8;
 extern float32_t speech_det_9;
 extern float32_t speech_det_10;
 extern float32_t speech_det_11;
+extern float32_t speech_det_12;
+extern float32_t speech_det_13;
+extern float32_t speech_det_14;
 
 
 extern float32_t speech_A[A_SIZE];

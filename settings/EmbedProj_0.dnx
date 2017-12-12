@@ -16,7 +16,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </JLinkDriver>
     <DebugChecksum>
-        <Checksum>3988940650</Checksum>
+        <Checksum>696017916</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -26,8 +26,8 @@
         <Enabled>_ 0</Enabled>
     </CodeCoverage>
     <Disassembly>
-        <MixedMode>1</MixedMode>
         <InstrCount>0</InstrCount>
+        <MixedMode>1</MixedMode>
     </Disassembly>
     <CallStack>
         <ShowArgs>0</ShowArgs>
@@ -95,8 +95,9 @@
         <Fmt1>uint8_t[10]	3	0</Fmt1>
     </array_types>
     <watch_formats>
-        <Fmt0>{W}42:output	4	0</Fmt0>
-        <Fmt1>{W}42:path_uint8[1]	3	0</Fmt1>
+        <Fmt0>{W}42:memoryAddr1	4	0</Fmt0>
+        <Fmt1>{W}42:output	4	0</Fmt1>
+        <Fmt2>{W}42:path_uint8[1]	3	0</Fmt2>
     </watch_formats>
     <Trace1>
         <Enabled>0</Enabled>
@@ -159,18 +160,13 @@
         <mode>0</mode>
     </DisassembleMode>
     <Breakpoints2>
-        <Bp0>_ 1 "EMUL_DATA_LOG" "prev_state" 0 0</Bp0>
-        <Count>1</Count>
+        <Count>0</Count>
     </Breakpoints2>
     <LogFile>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
         <Category>_ 0</Category>
     </LogFile>
-    <TermIOLog>
-        <LoggingEnabled>_ 1</LoggingEnabled>
-        <LogFile>_ "C:\Users\patri\Desktop\TermIO2.log"</LogFile>
-    </TermIOLog>
     <Aliases>
         <A0>_ "G:\Dropbox\Patrik\Skola\Project IS\EmbedProj_0.1\Core Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\iar\startup_stm32f10x_cl.s" ""</A0>
         <Count>1</Count>
@@ -189,4 +185,8 @@
     <CallStackStripe>
         <ShowTiming>1</ShowTiming>
     </CallStackStripe>
+    <TermIOLog>
+        <LoggingEnabled>_ 1</LoggingEnabled>
+        <LogFile>_ "C:\Users\patri\Desktop\TermIO10.log"</LogFile>
+    </TermIOLog>
 </settings>

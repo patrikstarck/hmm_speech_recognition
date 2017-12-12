@@ -21,7 +21,6 @@
 #include "drv_glcd_cnfg.h"
 #include "drv_glcd.h"
 #include "glcd_ll.h"
-#include "joels.h"
 
 #include "i2c1_drv.h"
 

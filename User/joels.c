@@ -54,80 +54,80 @@ uint8_t command_sequences[NUMBER_OF_COMMANDS][MAX_SEQ_PER_COMMAND][MAX_SEQUENCES
 /*Lexicon functions*/
 /*******************/
 
-void initLexicon() {
-    //Loop through number of words
-    for (int j=0;j<NUMBER_OF_WORDS;j++) {
-        //For each word, loop through number of sequence
-        for(int i=0;i<number_of_sequences[j];i++) {
-            //Add the seqences to the struct array
-            words[j].pho_seq[i] = &(word_sequences[j][i][0]);
-            words[j].length[i]=word_sequence_length[j][i];
-        }
-        words[j].nSeq=number_of_sequences[j];
-    }
-}
-
-void sequenceConverter(uint8_t* outSequence, uint8_t* inSequence, uint8_t length) {
-    
-    //Init output
-    for(int i=0;i<length;i++) {
-        *(outSequence+i)=100;
-    }
-    
-    for(int i=0;i<length;i++) {
-        uint8_t minIndex=0;
-        uint8_t minValue=1000;
-        for(int j=0;j<length;j++) {
-            if(*(inSequence+j)<minValue) {
-                minIndex=j;
-                minValue = *(inSequence+j);
-            }
-        }
-        if(minValue!=100) {
-            *(outSequence+i)=minIndex;
-            *(inSequence+minIndex)=100;
-        }
-        else {
-            break;
-        }
-    }
-    
-}
-
-void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length) {
-    
-    //Loop through all words
-    for (int j=0;j<NUMBER_OF_WORDS;j++) {
-        *(output+j) = 100;
-        //Loop through all sequences for each word
-        for(int i=0;i<words[j].nSeq;i++) {
-            
-            //Only find one sequence per word
-            if(*(output+j)!= 100) {
-                break;
-            }
-            
-            uint8_t compareIndex = 0;
-            for (int k=0;k<length;k++) {
-                if(*(sequence+k)== *(words[j].pho_seq[i]+compareIndex)) {
-                    compareIndex++;
-                    
-                    //word found?
-                    if(compareIndex==words[j].length[i]) {
-                        *(output+j)=(k+1)-compareIndex;
-                        break;
-                    }
-                }
-                else {
-                    compareIndex = 0;
-                    if(*(sequence+k)== *(words[j].pho_seq[i]+compareIndex)) {
-                        compareIndex++;
-                    }
-                }
-            }
-        }
-    }
-}
+//void initLexicon() {
+//    //Loop through number of words
+//    for (int j=0;j<NUMBER_OF_WORDS;j++) {
+//        //For each word, loop through number of sequence
+//        for(int i=0;i<number_of_sequences[j];i++) {
+//            //Add the seqences to the struct array
+//            words[j].pho_seq[i] = &(word_sequences[j][i][0]);
+//            words[j].length[i]=word_sequence_length[j][i];
+//        }
+//        words[j].nSeq=number_of_sequences[j];
+//    }
+//}
+//
+//void sequenceConverter(uint8_t* outSequence, uint8_t* inSequence, uint8_t length) {
+//    
+//    //Init output
+//    for(int i=0;i<length;i++) {
+//        *(outSequence+i)=100;
+//    }
+//    
+//    for(int i=0;i<length;i++) {
+//        uint8_t minIndex=0;
+//        uint8_t minValue=1000;
+//        for(int j=0;j<length;j++) {
+//            if(*(inSequence+j)<minValue) {
+//                minIndex=j;
+//                minValue = *(inSequence+j);
+//            }
+//        }
+//        if(minValue!=100) {
+//            *(outSequence+i)=minIndex;
+//            *(inSequence+minIndex)=100;
+//        }
+//        else {
+//            break;
+//        }
+//    }
+//    
+//}
+//
+//void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length) {
+//    
+//    //Loop through all words
+//    for (int j=0;j<NUMBER_OF_WORDS;j++) {
+//        *(output+j) = 100;
+//        //Loop through all sequences for each word
+//        for(int i=0;i<words[j].nSeq;i++) {
+//            
+//            //Only find one sequence per word
+//            if(*(output+j)!= 100) {
+//                break;
+//            }
+//            
+//            uint8_t compareIndex = 0;
+//            for (int k=0;k<length;k++) {
+//                if(*(sequence+k)== *(words[j].pho_seq[i]+compareIndex)) {
+//                    compareIndex++;
+//                    
+//                    //word found?
+//                    if(compareIndex==words[j].length[i]) {
+//                        *(output+j)=(k+1)-compareIndex;
+//                        break;
+//                    }
+//                }
+//                else {
+//                    compareIndex = 0;
+//                    if(*(sequence+k)== *(words[j].pho_seq[i]+compareIndex)) {
+//                        compareIndex++;
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 /*******************/
