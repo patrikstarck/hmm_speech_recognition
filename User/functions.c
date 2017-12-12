@@ -206,6 +206,9 @@ void searchPattern(uint8_t* output, uint8_t* sequence,uint8_t length) {
           //word found?
           if(compareIndex==words[j].length[i]) {
             *(output+j)=(k+1)-compareIndex;
+              for (int n = 0; n<length;n++) {
+                  *(sequence+n)=4;
+              }
             break;
           }
         }
