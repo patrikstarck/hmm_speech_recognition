@@ -444,11 +444,15 @@ void trans_path(arm_matrix_instance_f32 *filtered_path,uint8_t *trans_path,uint8
 	if(filtered_path->pData[filtered_path_length-1] == filtered_path->pData[filtered_path_length-2]) {
 		// Do nothing
 	}
+	else if (*(trans_path+trans_path_length-1 ) == (uint8_t)(filtered_path->pData[filtered_path_length-1])) {
+		// Do nothing
+	}	
 	else {
+		
 		for(int i = 0;i<(trans_path_length-1);i++) {
 			*(trans_path+i) = *(trans_path+i+1);// Move all elements on step to the right
 		}
-		*(trans_path +trans_path_length-1 ) = (uint8_t)(filtered_path->pData[filtered_path_length-1]);
+		*(trans_path+trans_path_length-1 ) = (uint8_t)(filtered_path->pData[filtered_path_length-1]);
 
 	}
 }
