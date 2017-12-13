@@ -126,19 +126,19 @@ void DMA1_Channel1_IRQHandler(void)
       languageBuffer(&lang_buff[0], &out[0],2, NUMBER_OF_WORDS);
       searchCommando(&lang_buff[0],2);
        
-//      
-//     //  printf("\n");
-//      for(int i=0;i<NUMBER_OF_WORDS;i++) {
-//        printf("%u ",out[i]);
-//      }
-//      printf("\n");
-//      for(int i=0;i<2;i++) {
-//        printf("%u ",lang_buff[i]);
-//      }
-//       printf("\n");
-//      printf("----------------------------------------------\n");
+      
+     //  printf("\n");
+      for(int i=0;i<NUMBER_OF_WORDS;i++) {
+        printf("%u ",out[i]);
+      }
+      printf("\n");
+      for(int i=0;i<2;i++) {
+        printf("%u ",lang_buff[i]);
+      }
+       printf("\n");
+      printf("----------------------------------------------\n");
     }
-      printf("%u ",speech_trans_path[9]);
+    //  printf("%u ",speech_trans_path[9]);
 cnt1 = TIM7->CNT;
 
   
