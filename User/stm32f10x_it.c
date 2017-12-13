@@ -30,13 +30,16 @@ uint16_t buttonPressed = 0;
 /*Output*/
 uint16_t playback_soundBuffer_index = 0;
 void outputSound() ;
-  unsigned int cnt1 = 0;
-unsigned int cnt2 = 0;
+
 
 /***/
 uint8_t prev_state=0;
 void saveBuffer();
 /**/
+
+
+unsigned int cnt1 = 0;
+unsigned int cnt2 = 0;
 
 /** @addtogroup Template_Project
   * @{
@@ -63,8 +66,7 @@ void saveBuffer();
 /*Interrupts from DMA-channel when half filled and filled*/
 void DMA1_Channel1_IRQHandler(void)
 {
-          cnt2 = TIM7->CNT; 
-//        printf("cnt1:%u cnt2:%u diff:%u \n",cnt1,cnt2,cnt2-cnt1);
+
   
   /*Do the when the buffer is half filled*/
   if(DMA_GetFlagStatus(DMA1_FLAG_HT1) != RESET) { 
@@ -94,7 +96,10 @@ void DMA1_Channel1_IRQHandler(void)
   
 
 
+    cnt1 = TIM7->CNT; 
 
+
+  
 
 
         //Convert to float
@@ -125,21 +130,38 @@ void DMA1_Channel1_IRQHandler(void)
       sequenceConverter(&out[0],&outputSequence[0],NUMBER_OF_WORDS);
       languageBuffer(&lang_buff[0], &out[0],2, NUMBER_OF_WORDS);
       searchCommando(&lang_buff[0],2);
-       
       
+        cnt2 = TIM7->CNT; 
+ // printf("cnt1:%u cnt2:%u diff:%u \n",cnt1,cnt2,cnt2-cnt1);
      //  printf("\n");
-      for(int i=0;i<NUMBER_OF_WORDS;i++) {
-        printf("%u ",out[i]);
+        
+//        
+//      for(int i=0;i<NUMBER_OF_WORDS;i++) {
+//        printf("%u ",out[i]);
+//      }
+//      printf("\n");
+//      for(int i=0;i<2;i++) {
+//        printf("%u ",lang_buff[i]);
+//      }
+//       printf("\n");
+//      printf("----------------------------------------------\n");
+      
+      disableLed(7);
+      disableLed(8);
+      disableLed(9);
+      if(lang_buff[1]==0) {
+        enableLed(7);
       }
-      printf("\n");
-      for(int i=0;i<2;i++) {
-        printf("%u ",lang_buff[i]);
+      if(lang_buff[1]==1) {
+        enableLed(8);
       }
-       printf("\n");
-      printf("----------------------------------------------\n");
+      if(lang_buff[1]==2) {
+        enableLed(9);
+      }
+
     }
-    //  printf("%u ",speech_trans_path[9]);
-cnt1 = TIM7->CNT;
+   //   printf("%u ",speech_trans_path[9]);
+
 
   
 }

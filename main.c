@@ -51,6 +51,9 @@ arm_matrix_instance_f32 MFCC_mat = {13,1,MFCC};
 
 void main(void) 
 {
+  
+
+  
     //Init the lexicon
   initLexicon();
   initLanguageModel();

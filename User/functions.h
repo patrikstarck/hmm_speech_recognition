@@ -21,7 +21,7 @@ extern uint8_t lang_buff[2];
 
 /*Defines*/
 #define NUMBER_OF_WORDS 3
-#define MAX_SEQ_PER_WORD 30
+#define MAX_SEQ_PER_WORD 70
 #define NUMBER_OF_COMMANDS 2
 #define MAX_SEQ_PER_COMMAND 20
 #define MAX_SEQUENCES_PER_SEQ 20
