@@ -388,6 +388,15 @@ void TIM6_IRQHandler(void)
   
 }
 
+//Interrupts from TIM7-channel
+void TIM7_IRQHandler(void)
+{
+  TIM_ClearFlag(TIM7,TIM_FLAG_Update);
+  TIM_Cmd(TIM7, DISABLE);
+  GPIO_ResetBits(GPIOE,GPIO_Pin_2);
+  GPIO_ResetBits(GPIOE,GPIO_Pin_3);
+}
+
 /**
   * @brief  This function handles CAN RX0 interrupt request.
   * @param  None

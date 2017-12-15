@@ -194,7 +194,6 @@ void main(void)
   PDMA_Configuration();
   
 
-
   
 //  //Test the lexicon search function
 // uint8_t string[22] = {2,2,20,0,0,1,1,0,2,2,2,0,2,2,2,2,2,5,1,4,2,4};
@@ -231,6 +230,8 @@ void enableLed(uint16_t ledNumber) {
   switch(ledNumber) {
     case(6):
       GPIO_SetBits(GPIOC,GPIO_Pin_6);
+      GPIO_SetBits(GPIOE,GPIO_Pin_2);
+      TIM_Cmd(TIM7, ENABLE);
       break;
     case(7):
       GPIO_SetBits(GPIOC,GPIO_Pin_7);
@@ -250,6 +251,8 @@ void disableLed(uint16_t ledNumber) {
   switch(ledNumber) {
     case(6):
       GPIO_ResetBits(GPIOC,GPIO_Pin_6);
+      GPIO_SetBits(GPIOE,GPIO_Pin_3);
+      TIM_Cmd(TIM7, ENABLE);
       break;
     case(7):
       GPIO_ResetBits(GPIOC,GPIO_Pin_7);
@@ -289,6 +292,12 @@ void PGPIO_Configuration(void)
      /* Configure PE1 (USER button) as input floating */
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(GPIOE, &GPIO_InitStructure);
+  
+       /* Configure PE2&3 as output floating */
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2|GPIO_Pin_3;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOE, &GPIO_InitStructure);
   
@@ -406,6 +415,14 @@ void PRNVIC_Conf(void)
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
   
+       /* Configure and enable TIM7 interrupt */
+  //This is for TIM6-interrupts
+  NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority =0 ;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+  
   
   //Enable DMA2 channel 3 IRQ Channel */
   //This is for DMA-interrupts
@@ -465,9 +482,9 @@ void PADC_Init_func(void )
   TIM_TimeBaseInit(TIM7, &TIM_TimeBaseStructure);
 
   /* TIM7 enable counter */
-  TIM_Cmd(TIM7, ENABLE);
+ // TIM_Cmd(TIM7, ENABLE);
   
- // TIM_ITConfig(TIM3, TIM_FLAG_Update, ENABLE);
+  TIM_ITConfig(TIM7, TIM_FLAG_Update, ENABLE);
   
 
   ADC_InitTypeDef	     ADC_InitStructure;
